@@ -1,4 +1,4 @@
-package main
+package adserver
 
 type AdInfo struct {
 	UnitId uint

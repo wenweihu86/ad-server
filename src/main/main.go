@@ -7,11 +7,12 @@ import (
 	"encoding/json"
 	"time"
 	"math/rand"
+	"adserver"
 )
 
 func SearchHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
-	req := new(Request)
+	req := new(adserver.Request)
 	// app_id
 	if len(r.Form["app_id"]) > 0 {
 		appId, _ := strconv.ParseUint(r.Form["app_id"][0], 10, 32)
@@ -45,13 +46,13 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 		req.OsVersion = r.Form["os_version"][0]
 	}
 
-	unitNum := len(AdUnits)
+	unitNum := len(adserver.AdUnits)
 	random := rand.New(rand.NewSource(time.Now().UnixNano()))
 	randIndex := random.Intn(unitNum)
-	adUnit := AdUnits[randIndex]
-	adCreative := AdCreativeMap[adUnit.CreativeId]
+	adUnit := adserver.AdUnits[randIndex]
+	adCreative := adserver.AdCreativeMap[adUnit.CreativeId]
 
-	adInfo := AdInfo{
+	adInfo := adserver.AdInfo{
 		UnitId: adUnit.UnitId,
 		CreativeId: adCreative.CreativeId,
 		IconImageUrl: adCreative.IconImageUrl,
@@ -61,9 +62,9 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 		AppPackageName: "",
 		ClickUrl: adCreative.ClickUrl,
 	}
-	adList := make([]AdInfo, 0, 1)
+	adList := make([]adserver.AdInfo, 0, 1)
 	adList = append(adList, adInfo)
-	res := Response{
+	res := adserver.Response{
 		ResCode: 0,
 		AdList: adList,
 	}
@@ -77,7 +78,7 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	ReadAdDict()
+	adserver.ReadAdDict()
 	http.HandleFunc("/ad/search", SearchHandler)
 	http.ListenAndServe(":8001", nil)
 }
