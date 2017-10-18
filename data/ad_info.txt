@@ -1,0 +1,20 @@
+1	1	1
+1	2	2
+1	3	3
+1	4	4
+1	5	5
+1	6	6
+1	7	7
+1	8	8
+1	9	9
+1	10	10
+2	1	小牛闪贷	http://s.zlongad.com/h/186e1	https://at.umeng.com/v05jGb
+2	2	现金侠	http://s.zlongad.com/h/186e1	http://channel.xianjinxia.com/act/light-loan-xjx-beta?invite_code=NDUyMzI5MA==&user_from=1244&id=1
+2	3	微盟贷款王	http://s.zlongad.com/h/186e1	http://m.daikuandawang.com/vd/mxiaodai/login3v?channelSource=TG00700000019
+2	4	用钱宝	http://s.zlongad.com/h/186e1	http://www.yongqianbao.com/w/index?c=850
+2	5	信用白条	http://s.zlongad.com/h/186e1	http://qb.wzdai.com/newh5/web/page/app-reg?source_tag=gcxx_43
+2	6	先花花	http://s.zlongad.com/h/186e1	http://weixin.xianhuahua.com/dev/coupon/couponappsix?from=1555
+2	7	及贷	http://s.zlongad.com/h/186e1	http://m.geedai.com/activity/reg/register.html?utm_source=wap_jidaiqudao20
+2	8	莫愁花	http://s.zlongad.com/h/186e1	http://api.xiaoyuedai.com/register.html?Y-80063
+2	9	打个借条	http://s.zlongad.com/h/186e1	http://www.huijieapp.com/h5/iou-web/signup-hongbao/?c=http://t.cn/RpgMzjj/qdrxyd4&i=http://t.cn/RarkGVv
+2	10	51借点花花	http://s.zlongad.com/h/186e1	https://b.jianbing.com/hd/20170913_jdhh_2?channel=rxkj58

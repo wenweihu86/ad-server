@@ -1,7 +1,7 @@
 package main
 
 type AdInfo struct {
-	AdId uint
+	UnitId uint
 	CreativeId uint
 	IconImageUrl string
 	MainImageUrl string

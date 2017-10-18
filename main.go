@@ -5,6 +5,8 @@ import (
 	"strconv"
 	"log"
 	"encoding/json"
+	"time"
+	"math/rand"
 )
 
 func SearchHandler(w http.ResponseWriter, r *http.Request) {
@@ -43,18 +45,21 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 		req.OsVersion = r.Form["os_version"][0]
 	}
 
-	log.Printf("appId=%d slotId=%d adNum=%d iP=%s deviceId=%s oS=%d osVersion=%s\n",
-		req.AppId, req.SlotId, req.AdNum, req.Ip, req.DeviceId, req.Os, req.OsVersion)
+	unitNum := len(AdUnits)
+	random := rand.New(rand.NewSource(time.Now().UnixNano()))
+	randIndex := random.Intn(unitNum)
+	adUnit := AdUnits[randIndex]
+	adCreative := AdCreativeMap[adUnit.CreativeId]
 
 	adInfo := AdInfo{
-		AdId: 1,
-		CreativeId: 1,
-		IconImageUrl: "http://www.baidu.com",
-		MainImageUrl: "http://www.weibo.com",
-		Title: "title",
-		Description: "description",
-		AppPackageName: "com.baidu.map",
-		ClickUrl: "http://map.baidu.com",
+		UnitId: adUnit.UnitId,
+		CreativeId: adCreative.CreativeId,
+		IconImageUrl: adCreative.IconImageUrl,
+		MainImageUrl: "",
+		Title: adCreative.Title,
+		Description: "",
+		AppPackageName: "",
+		ClickUrl: adCreative.ClickUrl,
 	}
 	adList := make([]AdInfo, 0, 1)
 	adList = append(adList, adInfo)
@@ -64,9 +69,15 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	resBytes, _ := json.Marshal(res)
 	w.Write(resBytes)
+
+	log.Printf("appId=%d slotId=%d adNum=%d iP=%s deviceId=%s oS=%d osVersion=%s " +
+		"unitId=%d creativeId=%d IconImageUrl=%s ClickUrl=%s\n",
+		req.AppId, req.SlotId, req.AdNum, req.Ip, req.DeviceId, req.Os, req.OsVersion,
+		adInfo.UnitId, adInfo.CreativeId, adInfo.IconImageUrl, adInfo.ClickUrl)
 }
 
 func main() {
+	ReadAdDict()
 	http.HandleFunc("/ad/search", SearchHandler)
 	http.ListenAndServe(":8001", nil)
 }
