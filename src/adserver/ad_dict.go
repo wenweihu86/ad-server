@@ -9,20 +9,36 @@ import (
 	"strconv"
 )
 
-type AdUnit struct {
-	UnitId uint
-	CreativeId uint
+type AdUnitInfo struct {
+	UnitId uint32
+	CreativeId uint32
 }
 
-type AdCreative struct {
-	CreativeId uint
+type AdCreativeInfo struct {
+	CreativeId uint32
 	Title string
+	Description string
+	AppPackageName string // for native app only
 	IconImageUrl string
+	MainImageUrl string
 	ClickUrl string
 }
 
-var AdUnits = make([]AdUnit, 0, 10000)
-var AdCreativeMap = make(map[uint]AdCreative, 10000)
+type AdDictInfo struct {
+	AdUnitMap map[uint32]AdUnitInfo
+	AdCreativeMap map[uint32]AdCreativeInfo
+	LocationUnitMap map[string][]uint32
+}
+
+var AdDict *AdDictInfo
+
+func init()  {
+	AdDict = &AdDictInfo{
+		AdUnitMap: make(map[uint32]AdUnitInfo),
+		AdCreativeMap: make(map[uint32]AdCreativeInfo),
+		LocationUnitMap: make(map[string][]uint32),
+	}
+}
 
 func ReadAdDict() {
 	dictFileName := "./data/ad_info.txt"
@@ -46,11 +62,11 @@ func ReadAdDict() {
 			// ad unit info
 			unitId, _ := strconv.ParseUint(lines[1], 10, 32)
 			creativeId, _ := strconv.ParseUint(lines[2], 10, 32)
-			adUnit := AdUnit{
-				UnitId: uint(unitId),
-				CreativeId: uint(creativeId),
+			adUnit := AdUnitInfo{
+				UnitId: uint32(unitId),
+				CreativeId: uint32(creativeId),
 			}
-			AdUnits = append(AdUnits, adUnit)
+			AdDict.AdUnitMap[adUnit.UnitId] = adUnit
 			lineNum++
 			fmt.Printf("read ad unit info, unitId=%d creativeId=%d\n",
 				unitId, creativeId)
@@ -58,18 +74,42 @@ func ReadAdDict() {
 			// creative info
 			creativeId, _ := strconv.ParseUint(lines[1], 10, 32)
 			title := lines[2]
-			iconImageUrl := lines[3]
-			clickUrl := lines[4]
-			adCreative := AdCreative{
-				CreativeId: uint(creativeId),
+			description := lines[3]
+			packageName := lines[4]
+			iconImageUrl := lines[5]
+			mainImageUrl := lines[6]
+			clickUrl := lines[7]
+			adCreative := AdCreativeInfo{
+				CreativeId: uint32(creativeId),
 				Title: title,
+				Description: description,
+				AppPackageName: packageName,
 				IconImageUrl: iconImageUrl,
+				MainImageUrl: mainImageUrl,
 				ClickUrl: clickUrl,
 			}
-			AdCreativeMap[adCreative.CreativeId] = adCreative
+			AdDict.AdCreativeMap[adCreative.CreativeId] = adCreative
 			lineNum++
-			fmt.Printf("read ad creative info, creativeId=%d title=%s iconImageUrl=%s clickUrl=%s\n",
-				creativeId, title, iconImageUrl, clickUrl)
+			fmt.Printf("read ad creative info, creativeId=%d " +
+				"title=%s description=%s package=%s iconImageUrl=%s " +
+				"mainImageUrl=%s clickUrl=%s\n",
+				creativeId, title, description, packageName,
+				iconImageUrl, mainImageUrl, clickUrl)
+		} else if level == 3 {
+			// location target
+			unitId, _ := strconv.ParseUint(lines[1], 10, 32)
+			country := strings.ToLower(lines[2])
+			city := strings.ToLower(lines[3])
+			key := country + "_" + city
+			unitIdList, exist := AdDict.LocationUnitMap[key]
+			if !exist {
+				unitIdList = make([]uint32, 0)
+			}
+			unitIdList = append(unitIdList, uint32(unitId))
+			AdDict.LocationUnitMap[key] = unitIdList
+			fmt.Printf("read location target info, unitId=%d country=%s city=%s\n",
+				unitId, country, city)
+			lineNum++
 		}
 	}
 	fmt.Printf("read ad info file success, lineNum=%d\n", lineNum)

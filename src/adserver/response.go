@@ -1,8 +1,8 @@
 package adserver
 
 type AdInfo struct {
-	UnitId uint
-	CreativeId uint
+	UnitId uint32
+	CreativeId uint32
 	IconImageUrl string
 	MainImageUrl string
 	Title string
@@ -12,6 +12,6 @@ type AdInfo struct {
 }
 
 type Response struct {
-	ResCode int
+	ResCode int32
 	AdList []AdInfo
 }

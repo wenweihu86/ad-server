@@ -8,13 +8,23 @@
 1	8	8
 1	9	9
 1	10	10
-2	1	小牛闪贷	http://s.zlongad.com/h/186e1	https://at.umeng.com/v05jGb
-2	2	现金侠	http://s.zlongad.com/h/186e1	http://channel.xianjinxia.com/act/light-loan-xjx-beta?invite_code=NDUyMzI5MA==&user_from=1244&id=1
-2	3	微盟贷款王	http://s.zlongad.com/h/186e1	http://m.daikuandawang.com/vd/mxiaodai/login3v?channelSource=TG00700000019
-2	4	用钱宝	http://s.zlongad.com/h/186e1	http://www.yongqianbao.com/w/index?c=850
-2	5	信用白条	http://s.zlongad.com/h/186e1	http://qb.wzdai.com/newh5/web/page/app-reg?source_tag=gcxx_43
-2	6	先花花	http://s.zlongad.com/h/186e1	http://weixin.xianhuahua.com/dev/coupon/couponappsix?from=1555
-2	7	及贷	http://s.zlongad.com/h/186e1	http://m.geedai.com/activity/reg/register.html?utm_source=wap_jidaiqudao20
-2	8	莫愁花	http://s.zlongad.com/h/186e1	http://api.xiaoyuedai.com/register.html?Y-80063
-2	9	打个借条	http://s.zlongad.com/h/186e1	http://www.huijieapp.com/h5/iou-web/signup-hongbao/?c=http://t.cn/RpgMzjj/qdrxyd4&i=http://t.cn/RarkGVv
-2	10	51借点花花	http://s.zlongad.com/h/186e1	https://b.jianbing.com/hd/20170913_jdhh_2?channel=rxkj58
+2	1	小牛闪贷	desc	pkg	http://s.zlongad.com/h/186e1	mainImageUrl	https://at.umeng.com/v05jGb
+2	2	现金侠	desc	pkg	http://s.zlongad.com/h/186e1	mainImageUrl	http://channel.xianjinxia.com/act/light-loan-xjx-beta?invite_code=NDUyMzI5MA==&user_from=1244&id=1
+2	3	微盟贷款王	desc	pkg	http://s.zlongad.com/h/186e1	mainImageUrl	http://m.daikuandawang.com/vd/mxiaodai/login3v?channelSource=TG00700000019
+2	4	用钱宝	desc	pkg	http://s.zlongad.com/h/186e1	mainImageUrl	http://www.yongqianbao.com/w/index?c=850
+2	5	信用白条	desc	pkg	http://s.zlongad.com/h/186e1	mainImageUrl	http://qb.wzdai.com/newh5/web/page/app-reg?source_tag=gcxx_43
+2	6	先花花	desc	pkg	http://s.zlongad.com/h/186e1	mainImageUrl	http://weixin.xianhuahua.com/dev/coupon/couponappsix?from=1555
+2	7	及贷	desc	pkg	http://s.zlongad.com/h/186e1	mainImageUrl	http://m.geedai.com/activity/reg/register.html?utm_source=wap_jidaiqudao20
+2	8	莫愁花	desc	pkg	http://s.zlongad.com/h/186e1	mainImageUrl	http://api.xiaoyuedai.com/register.html?Y-80063
+2	9	打个借条	desc	pkg	http://s.zlongad.com/h/186e1	mainImageUrl	http://www.huijieapp.com/h5/iou-web/signup-hongbao/?c=http://t.cn/RpgMzjj/qdrxyd4&i=http://t.cn/RarkGVv
+2	10	51借点花花	desc	pkg	http://s.zlongad.com/h/186e1	mainImageUrl	https://b.jianbing.com/hd/20170913_jdhh_2?channel=rxkj58
+3	1	CN	ALL
+3	2	CN	ALL
+3	3	CN	ALL
+3	4	CN	ALL
+3	5	CN	ALL
+3	6	CN	ALL
+3	7	CN	ALL
+3	8	CN	ALL
+3	9	CN	ALL
+3	10	CN	ALL
