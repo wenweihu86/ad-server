@@ -7,8 +7,9 @@ import (
 	"encoding/json"
 	"time"
 	"math/rand"
-	"ad-server/src/adserver"
-	"ad-server/src/adhandler"
+
+	"adserver"
+	"adhandler"
 )
 
 func SearchHandler(w http.ResponseWriter, r *http.Request) {

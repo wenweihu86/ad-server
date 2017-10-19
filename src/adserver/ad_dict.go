@@ -21,8 +21,8 @@ type AdCreative struct {
 	ClickUrl string
 }
 
-var AdUnits []AdUnit = make([]AdUnit, 0, 10000)
-var AdCreativeMap map[uint]AdCreative = make(map[uint]AdCreative, 10000)
+var AdUnits = make([]AdUnit, 0, 10000)
+var AdCreativeMap = make(map[uint]AdCreative, 10000)
 
 func ReadAdDict() {
 	dictFileName := "./data/ad_info.txt"

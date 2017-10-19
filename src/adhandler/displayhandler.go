@@ -2,15 +2,16 @@ package adhandler
 import (
 	"net/http"
 	"strconv"
-	"encoding/json"
 	"time"
-	//"math/rand"
-	"ad-server/src/adserver"
-	"encoding/base64"
-	"fmt"
-	"github.com/sirupsen/logrus"
 	"os"
-	"ad-server/src/utils"
+	"fmt"
+	"encoding/json"
+	"encoding/base64"
+
+	"github.com/sirupsen/logrus"
+
+	"adserver"
+	"utils"
 )
 //展示handler
 func DisplayHandler(w http.ResponseWriter, r *http.Request) {

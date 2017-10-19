@@ -1,17 +1,17 @@
 package adhandler
 import (
-	"net/http"
-	"strconv"
-	
-	"encoding/json"
-	"time"
-	//"math/rand"
-	"ad-server/src/adserver"
-	"fmt"
-	"encoding/base64"
-	"github.com/sirupsen/logrus"
-	"ad-server/src/utils"
 	"os"
+	"time"
+	"fmt"
+	"strconv"
+	"net/http"
+	"encoding/json"
+	"encoding/base64"
+
+	"github.com/sirupsen/logrus"
+
+	"adserver"
+	"utils"
 )
 var adlog = logrus.New()
 var logpath="./data/logfile/"
