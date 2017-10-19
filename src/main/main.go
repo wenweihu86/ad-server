@@ -7,7 +7,8 @@ import (
 	"encoding/json"
 	"time"
 	"math/rand"
-	"adserver"
+	"ad-server/src/adserver"
+	"ad-server/src/adhandler"
 )
 
 func SearchHandler(w http.ResponseWriter, r *http.Request) {
@@ -80,5 +81,7 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 func main() {
 	adserver.ReadAdDict()
 	http.HandleFunc("/ad/search", SearchHandler)
+	http.HandleFunc("/ad/impression",adhandler.DisplayHandler)
+	http.HandleFunc("/ad/click",adhandler.ClickHandler)
 	http.ListenAndServe(":8001", nil)
 }

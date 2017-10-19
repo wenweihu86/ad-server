@@ -8,4 +8,8 @@ type Request struct {
 	DeviceId string
 	Os uint // 0:android, 1:ios
 	OsVersion string
+	UnitId string
+	CreativeId string
+	SearchId string
+	ClickUrl string
 }
