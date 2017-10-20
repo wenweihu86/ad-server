@@ -9,6 +9,8 @@ type AdInfo struct {
 	Description string
 	AppPackageName string
 	ClickUrl string
+	ImpressionTrackUrl string
+	ClickTrackUrl string
 }
 
 type Response struct {

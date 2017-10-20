@@ -10,6 +10,8 @@ import (
 	"adserver"
 	"strings"
 	"fmt"
+	"bytes"
+	"encoding/base64"
 )
 
 func SearchHandler(w http.ResponseWriter, r *http.Request) {
@@ -99,6 +101,7 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 			MainImageUrl: adCreative.MainImageUrl,
 			ClickUrl: adCreative.ClickUrl,
 		}
+		adInfo.ImpressionTrackUrl = buildImpressionTrackUrl(req, adInfo)
 		adList := make([]adserver.AdInfo, 0, 1)
 		adList = append(adList, adInfo)
 		res.ResCode = 0
@@ -117,3 +120,17 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 	resBytes, _ := json.Marshal(res)
 	w.Write(resBytes)
 }
+
+func buildImpressionTrackUrl(req *adserver.Request, adInfo adserver.AdInfo) string {
+	var paramBuf bytes.Buffer
+	paramBuf.WriteString(fmt.Sprintf("slotId=%s", req.SlotId))
+	paramBuf.WriteString(fmt.Sprintf("ip=%s", req.Ip))
+	paramBuf.WriteString(fmt.Sprintf("os=%d", req.Os))
+	paramBuf.WriteString(fmt.Sprintf("unitId=%s", adInfo.UnitId))
+	paramBuf.WriteString(fmt.Sprintf("creativeId=%s", adInfo.CreativeId))
+	paramEncoded := base64.StdEncoding.EncodeToString(paramBuf.Bytes())
+	impressionTrackUrl := fmt.Sprintf("%s?i=%s",
+		"http://localhost:8001/ad/impression", paramEncoded)
+	return impressionTrackUrl
+}
+
