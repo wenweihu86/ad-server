@@ -1,27 +1,36 @@
 package adhandler
 import (
-	"os"
-	"time"
-	"fmt"
-	"strconv"
 	"net/http"
-	"encoding/json"
-	"encoding/base64"
-
+	"strconv"
+	//"math/rand"
+	"ad-server/src/adserver"
+	"fmt"
+    "encoding/base64"
 	"github.com/sirupsen/logrus"
-
-	"adserver"
-	"utils"
+	"ad-server/src/utils"
+	"os"
 )
 var adlog = logrus.New()
-var logpath="./data/logfile/"
+var logpath = "./data/log/"
+var clickFile *os.File
+func init(){
+	logFile := utils.GetLogFileName("click",logpath)
+    //判断日志文件是否存在
+    if !utils.CheckFileIsExist(logFile){
+    	_ , err := os.Create(logFile) 
+		if err != nil{
+		   fmt.Println(err)
+		}
+    }
+    clickFile , _= os.OpenFile(logFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666) 
+}
 func ClickHandler(w http.ResponseWriter, r *http.Request) {
 	//获得编码后的查询字符串
-	queryStringEncoded:=r.URL.RawQuery
+	queryStringEncoded := r.URL.RawQuery
 	//解码
-    queryStringDecodedBytes,err:=base64.StdEncoding.DecodeString(queryStringEncoded)
-    if err!=nil{//异常处理
-    	fmt.Println("error:",err)
+    queryStringDecodedBytes , err := base64.StdEncoding.DecodeString(queryStringEncoded)
+    if err != nil{//异常处理
+    	fmt.Println("error:" , err)
         res := adserver.Response{
 			ResCode: 4,
 			AdList: nil,
@@ -29,7 +38,7 @@ func ClickHandler(w http.ResponseWriter, r *http.Request) {
 		resBytes, _ := json.Marshal(res)
 		w.Write(resBytes)
     }
-    r.URL.RawQuery=string(queryStringDecodedBytes)
+    r.URL.RawQuery = string(queryStringDecodedBytes)
 
 	r.ParseForm()
 	req := new(adserver.Request)
@@ -82,33 +91,8 @@ func ClickHandler(w http.ResponseWriter, r *http.Request) {
 	if len(r.Form["click_url"]) > 0 {
 		req.ClickUrl = r.Form["click_url"][0]
 	}
-    //log设置输出
-    adlog.Out = os.Stdout
-    dateStr:=strconv.Itoa(time.Now().Year())+strconv.Itoa(int(time.Now().Month()))+strconv.Itoa(time.Now().Day())
-    logFileName:=dateStr+"log.log"
-    logFile:=logpath+logFileName
-    fmt.Println(logFile)
-    //判断日志文件是否存在
-    if !utils.CheckFileIsExist(logFile){
-    	_,err:= os.Create(logFile) 
-		if err!=nil{
-		   fmt.Println(err)
-		   res := adserver.Response{
-				ResCode: 4,
-				AdList: nil,
-			}
-			resBytes, _ := json.Marshal(res)
-			w.Write(resBytes)
-		}
-    }
-    file, err := os.OpenFile(logFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
-	if err == nil {
-	    adlog.Out = file
-	} else {
-	    adlog.Info("Failed to log to file, using default stderr")
-	    fmt.Println(err)
-	}
-    
+	//
+	adlog.Out = clickFile
     adlog.WithFields(logrus.Fields{
 	    "appId": req.AppId,
 	    "slotId":  req.SlotId,
@@ -121,5 +105,5 @@ func ClickHandler(w http.ResponseWriter, r *http.Request) {
         "creativeId":req.CreativeId,
         "searchId":req.SearchId,
         "clickUrl":req.ClickUrl,
-    }).Info("test")
+    }).Info("test click")
 }
