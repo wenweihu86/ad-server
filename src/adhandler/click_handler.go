@@ -5,18 +5,16 @@ import (
 	//"math/rand"
 	"adserver"
     "encoding/base64"
-	"github.com/sirupsen/logrus"
-	"time"
+	"github.com/ibbd-dev/go-async-log"
 )
-func ClickHandler(w http.ResponseWriter, r *http.Request) {
-	ConfigLocalFilesystemLogger("./log/click","click.log",time.Hour*24,time.Hour)
+var logfileClick = asyncLog.NewLogFile("./log/click/click.log")
+func ClickHandler(w http.ResponseWriter, r *http.Request) {	
 	
 	//获得编码后的查询字符串
 	queryStringEncoded := r.URL.RawQuery
 	//解码
     queryStringDecodedBytes , err := base64.StdEncoding.DecodeString(queryStringEncoded)
-    if err != nil {//异常处理
-    	adLog.Println(err)
+    if err != nil {
         return
     }
     r.URL.RawQuery = string(queryStringDecodedBytes)
@@ -72,17 +70,8 @@ func ClickHandler(w http.ResponseWriter, r *http.Request) {
 	if len(r.Form["click_url"]) > 0 {
 		req.ClickUrl = r.Form["click_url"][0]
 	}
-    adLog.WithFields(logrus.Fields{
-	    "appId": req.AppId,
-	    "slotId":  req.SlotId,
-	    "adNum":req.AdNum,
-	    "iP":req.Ip,
-        "deviceId":req.DeviceId,
-        "oS":req.Os,
-        "osVersion":req.OsVersion,
-        "unitId":req.UnitId,
-        "creativeId":req.CreativeId,
-        "searchId":req.SearchId,
-        "clickUrl":req.ClickUrl,
-    }).Info("test click")
+	err= logfileClick.Write("i am click")
+	if err!=nil{
+		return
+	}
 }

@@ -5,19 +5,24 @@ import (
 	//"math/rand"
 	"adserver"
 	"encoding/base64"
-	"time"
-	"github.com/sirupsen/logrus"
+	"github.com/ibbd-dev/go-async-log"
 )
-
+/*
+*  ibbd-dev/go-async-log 日志框架说明
+*  1. 自动切割周期：默认按小时
+*  2. 默认全部写入文件
+*  3. 批量写入周期：默认每秒写入一次
+*  4. 是否需要Flags：默认需要
+*/
+var logfileImpression = asyncLog.NewLogFile("./log/impression/impression.log")
 //展示handler
 func ImpressionHandler(w http.ResponseWriter, r *http.Request) {
-	ConfigLocalFilesystemLogger("./log/impression","impression.log",time.Hour*24,time.Hour)
+	
 	//获得编码后的查询字符串
 	queryStringEncoded := r.URL.RawQuery
 	//解码
     queryStringDecodedBytes,err := base64.StdEncoding.DecodeString(queryStringEncoded)
-    if err != nil{//异常处理
-    	adLog.Println(err)
+    if err != nil{ 	
         return
     }
     r.URL.RawQuery = string(queryStringDecodedBytes)
@@ -68,16 +73,5 @@ func ImpressionHandler(w http.ResponseWriter, r *http.Request) {
 	if len(r.Form["search_id"]) > 0 {
 		req.SearchId = r.Form["search_id"][0]
 	}
-    adLog.WithFields(logrus.Fields{
-	    "appId": req.AppId,
-	    "slotId":  req.SlotId,
-	    "adNum":req.AdNum,
-	    "iP":req.Ip,
-        "deviceId":req.DeviceId,
-        "oS":req.Os,
-        "osVersion":req.OsVersion,
-        "unitId":req.UnitId,
-        "creativeId":req.CreativeId,
-        "searchId":req.SearchId,
-    }).Info("test displayHandler")
+    logfileImpression.Write("i am impression")
 }
