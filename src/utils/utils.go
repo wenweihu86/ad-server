@@ -10,7 +10,7 @@ func CheckFileIsExist(filename string) (bool) {
 	}
 	return true;
 }
-func GetLogFileName(filename,logpath string) string{
+func GetLogFileName(filename,logpath string) string {
 	dateStr := strconv.Itoa(time.Now().Year()) + strconv.Itoa(int(time.Now().Month())) + strconv.Itoa(time.Now().Day())+strconv.Itoa(time.Now().Hour())
     var logFileName string
     if filename == "impression"{

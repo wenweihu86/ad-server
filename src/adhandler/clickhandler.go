@@ -3,40 +3,21 @@ import (
 	"net/http"
 	"strconv"
 	//"math/rand"
-	"ad-server/src/adserver"
-	"fmt"
+	"adserver"
     "encoding/base64"
 	"github.com/sirupsen/logrus"
-	"ad-server/src/utils"
-	"os"
+	"time"
 )
-var adlog = logrus.New()
-var logpath = "./data/log/"
-var clickFile *os.File
-func init(){
-	logFile := utils.GetLogFileName("click",logpath)
-    //判断日志文件是否存在
-    if !utils.CheckFileIsExist(logFile){
-    	_ , err := os.Create(logFile) 
-		if err != nil{
-		   fmt.Println(err)
-		}
-    }
-    clickFile , _= os.OpenFile(logFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666) 
-}
 func ClickHandler(w http.ResponseWriter, r *http.Request) {
+	ConfigLocalFilesystemLogger("./log/click","click.log",time.Hour*24,time.Hour)
+	
 	//获得编码后的查询字符串
 	queryStringEncoded := r.URL.RawQuery
 	//解码
     queryStringDecodedBytes , err := base64.StdEncoding.DecodeString(queryStringEncoded)
-    if err != nil{//异常处理
-    	fmt.Println("error:" , err)
-        res := adserver.Response{
-			ResCode: 4,
-			AdList: nil,
-		}
-		resBytes, _ := json.Marshal(res)
-		w.Write(resBytes)
+    if err != nil {//异常处理
+    	adLog.Println(err)
+        return
     }
     r.URL.RawQuery = string(queryStringDecodedBytes)
 
@@ -91,9 +72,7 @@ func ClickHandler(w http.ResponseWriter, r *http.Request) {
 	if len(r.Form["click_url"]) > 0 {
 		req.ClickUrl = r.Form["click_url"][0]
 	}
-	//
-	adlog.Out = clickFile
-    adlog.WithFields(logrus.Fields{
+    adLog.WithFields(logrus.Fields{
 	    "appId": req.AppId,
 	    "slotId":  req.SlotId,
 	    "adNum":req.AdNum,

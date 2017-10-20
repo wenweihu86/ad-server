@@ -3,40 +3,22 @@ import (
 	"net/http"
 	"strconv"
 	//"math/rand"
-	"ad-server/src/adserver"
+	"adserver"
 	"encoding/base64"
-	"fmt"
+	"time"
 	"github.com/sirupsen/logrus"
-	"os"
-	"ad-server/src/utils"
 )
-var impressionFile *os.File
-func init(){
-	logFile:=utils.GetLogFileName("impression",logpath)
-    //判断日志文件是否存在
-    if !utils.CheckFileIsExist(logFile){
-    	_,err := os.Create(logFile) 
-		if err != nil{
-            fmt.Println("**********")
-		    fmt.Println(err)
-		}
-    }
-    impressionFile , _ = os.OpenFile(logFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
-}
+
 //展示handler
 func DisplayHandler(w http.ResponseWriter, r *http.Request) {
+	ConfigLocalFilesystemLogger("./log/impression","impression.log",time.Hour*24,time.Hour)
 	//获得编码后的查询字符串
 	queryStringEncoded := r.URL.RawQuery
 	//解码
     queryStringDecodedBytes,err := base64.StdEncoding.DecodeString(queryStringEncoded)
     if err != nil{//异常处理
-    	fmt.Println("error:",err)
-        res := adserver.Response{
-			ResCode: 4,
-			AdList: nil,
-		}
-		resBytes , _ := json.Marshal(res)
-		w.Write(resBytes)
+    	adLog.Println(err)
+        return
     }
     r.URL.RawQuery = string(queryStringDecodedBytes)
     
@@ -86,8 +68,7 @@ func DisplayHandler(w http.ResponseWriter, r *http.Request) {
 	if len(r.Form["search_id"]) > 0 {
 		req.SearchId = r.Form["search_id"][0]
 	}
-	adlog.Out = impressionFile
-    adlog.WithFields(logrus.Fields{
+    adLog.WithFields(logrus.Fields{
 	    "appId": req.AppId,
 	    "slotId":  req.SlotId,
 	    "adNum":req.AdNum,
