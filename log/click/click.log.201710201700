@@ -1,0 +1,6 @@
+time="2017-10-20T17:20:44+08:00" level=info msg="test click" adNum=1 appId=1 clickUrl=baidu.com creativeId=456 deviceId=0x22q53 iP=127.0.0.1 oS=1 osVersion=1.0.0 searchId=123 slotId=2 unitId=123
+time="2017-10-20T17:20:53+08:00" level=info msg="test click" adNum=1 appId=1 clickUrl=baidu.com creativeId=456 deviceId=0x22q53 iP=127.0.0.1 oS=1 osVersion=1.0.0 searchId=123 slotId=2 unitId=123
+time="2017-10-20T17:20:53+08:00" level=info msg="test click" adNum=1 appId=1 clickUrl=baidu.com creativeId=456 deviceId=0x22q53 iP=127.0.0.1 oS=1 osVersion=1.0.0 searchId=123 slotId=2 unitId=123
+time="2017-10-20T17:21:21+08:00" level=info msg="test click" adNum=1 appId=1 clickUrl=baidu.com creativeId=456 deviceId=0x22q53 iP=127.0.0.1 oS=1 osVersion=1.0.0 searchId=123 slotId=2 unitId=123
+time="2017-10-20T17:21:21+08:00" level=info msg="test click" adNum=1 appId=1 clickUrl=baidu.com creativeId=456 deviceId=0x22q53 iP=127.0.0.1 oS=1 osVersion=1.0.0 searchId=123 slotId=2 unitId=123
+time="2017-10-20T17:21:21+08:00" level=info msg="test click" adNum=1 appId=1 clickUrl=baidu.com creativeId=456 deviceId=0x22q53 iP=127.0.0.1 oS=1 osVersion=1.0.0 searchId=123 slotId=2 unitId=123
