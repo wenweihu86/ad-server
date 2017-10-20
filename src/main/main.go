@@ -7,7 +7,10 @@ import (
 )
 
 func main() {
-	adserver.ReadAdDict()
+	adserver.LoadLocationDict(
+		"./data/GeoLiteCity-Blocks.csv",
+		"./data/GeoLiteCity-Location.csv")
+	adserver.ReadAdDict("./data/ad_info.txt")
 	http.HandleFunc("/ad/search", adhandler.SearchHandler)
 	http.HandleFunc("/ad/impression",adhandler.ImpressionHandler)
 	http.HandleFunc("/ad/click",adhandler.ClickHandler)

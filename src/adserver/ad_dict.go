@@ -40,8 +40,7 @@ func init()  {
 	}
 }
 
-func ReadAdDict() {
-	dictFileName := "./data/ad_info.txt"
+func ReadAdDict(dictFileName string) {
 	dictFile, err := os.Open(dictFileName)
 	if err != nil {
 		fmt.Printf("open file error, name=%s\n", dictFileName)

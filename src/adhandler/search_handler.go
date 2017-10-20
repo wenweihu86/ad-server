@@ -9,6 +9,7 @@ import (
 	"math/rand"
 	"adserver"
 	"strings"
+	"fmt"
 )
 
 func SearchHandler(w http.ResponseWriter, r *http.Request) {
@@ -47,16 +48,41 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 		req.OsVersion = r.Form["os_version"][0]
 	}
 
-	// TODO: read from location dict
-	country := "CN"
-	city := "ALL"
-	key := strings.ToLower(country) + "_" + strings.ToLower(city)
+	// search by request ip
 	adDict := adserver.AdDict
-	unitIdList, exist := adDict.LocationUnitMap[key]
+	var unitIdList1 []uint32
+	var exist1 bool
+	locationInfo := adserver.SearchLocationByIp(req.Ip)
+	if locationInfo != nil {
+		country := locationInfo.Country
+		city := locationInfo.City
+		fmt.Printf("ip=%s country=%s city=%s\n", req.Ip, country, city)
+		key := strings.ToLower(country) + "_" + strings.ToLower(city)
+		unitIdList1, exist1 = adDict.LocationUnitMap[key]
+	}
+	// search by CN_ALL
+	key := "cn_all"
+	unitIdList2, exist2 := adDict.LocationUnitMap[key]
+	// merge two unit id list
+	unitNum := 0
+	if exist1 {
+		unitNum += len(unitIdList1)
+	}
+	if exist2 {
+		unitNum += len(unitIdList2)
+	}
+	unitIdList := make([]uint32, unitNum)
+	if exist1 && unitIdList1 != nil {
+		copy(unitIdList, unitIdList1)
+	}
+	if exist2 && unitIdList2 != nil {
+		copy(unitIdList, unitIdList2)
+	}
 
+	// select one from unit id list
 	var res = &adserver.Response{}
-	if exist {
-		unitNum := len(unitIdList)
+	if unitIdList != nil {
+		unitNum = len(unitIdList)
 		random := rand.New(rand.NewSource(time.Now().UnixNano()))
 		randIndex := random.Intn(unitNum)
 		unitId := unitIdList[randIndex]
