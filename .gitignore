@@ -14,3 +14,6 @@
 .glide/
 .idea
 .DS_Store
+data-test
+log
+ad_server

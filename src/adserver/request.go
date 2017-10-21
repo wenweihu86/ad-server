@@ -1,7 +1,7 @@
 package adserver
 
 type Request struct {
-	AppId uint32
+	SearchId string
 	SlotId uint32
 	AdNum uint32
 	Ip string
@@ -10,6 +10,5 @@ type Request struct {
 	OsVersion string
 	UnitId uint32
 	CreativeId uint32
-	SearchId string
 	ClickUrl string
 }

@@ -11,16 +11,12 @@ import (
 	"fmt"
 	"bytes"
 	"encoding/base64"
+	"github.com/satori/go.uuid"
 )
 
 func SearchHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	req := new(adserver.Request)
-	// app_id
-	if len(r.Form["app_id"]) > 0 {
-		appId, _ := strconv.ParseUint(r.Form["app_id"][0], 10, 32)
-		req.AppId = uint32(appId)
-	}
 	// slot_id
 	if len(r.Form["slot_id"]) > 0 {
 		slotId, _ := strconv.ParseUint(r.Form["slot_id"][0], 10, 32)
@@ -48,6 +44,9 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 	if len(r.Form["os_version"]) > 0 {
 		req.OsVersion = r.Form["os_version"][0]
 	}
+
+	// searchId
+	req.SearchId = uuid.NewV4().String()
 
 	// search by request ip
 	adDict := adserver.AdDict
@@ -102,21 +101,22 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 			ClickUrl: adCreative.ClickUrl,
 		}
 		adInfo.ImpressionTrackUrl = buildImpressionTrackUrl(req, adInfo)
+		adInfo.ClickTrackUrl = buildClickTrackUrl(req, adInfo)
 		adList := make([]adserver.AdInfo, 0, 1)
 		adList = append(adList, adInfo)
 		res.ResCode = 0
 		res.AdList = adList
 		adserver.SearchLog.Info(fmt.Sprintf(
-			"appId=%d slotId=%d adNum=%d iP=%s deviceId=%s oS=%d osVersion=%s " +
-			"unitId=%d creativeId=%d IconImageUrl=%s ClickUrl=%s\n",
-			req.AppId, req.SlotId, req.AdNum, req.Ip, req.DeviceId, req.Os, req.OsVersion,
-			adInfo.UnitId, adInfo.CreativeId, adInfo.IconImageUrl, adInfo.ClickUrl))
+			"searchId=%s slotId=%d adNum=%d iP=%s deviceId=%s oS=%d osVersion=%s " +
+			"unitId=%d creativeId=%d\n",
+			req.SearchId, req.SlotId, req.AdNum, req.Ip, req.DeviceId, req.Os, req.OsVersion,
+			adInfo.UnitId, adInfo.CreativeId))
 	} else {
 		res.ResCode = 0
 		res.AdList = make([]adserver.AdInfo, 0, 1)
 		adserver.SearchLog.Info(fmt.Sprintf(
-			"appId=%d slotId=%d adNum=%d iP=%s deviceId=%s oS=%d osVersion=%s resNum=0\n",
-			req.AppId, req.SlotId, req.AdNum, req.Ip, req.DeviceId, req.Os, req.OsVersion))
+			"searchId=%s slotId=%d adNum=%d iP=%s deviceId=%s oS=%d osVersion=%s resNum=0\n",
+			req.SearchId, req.SlotId, req.AdNum, req.Ip, req.DeviceId, req.Os, req.OsVersion))
 	}
 
 	resBytes, _ := json.Marshal(res)
@@ -125,14 +125,34 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 
 func buildImpressionTrackUrl(req *adserver.Request, adInfo adserver.AdInfo) string {
 	var paramBuf bytes.Buffer
-	paramBuf.WriteString(fmt.Sprintf("slotId=%s", req.SlotId))
-	paramBuf.WriteString(fmt.Sprintf("ip=%s", req.Ip))
-	paramBuf.WriteString(fmt.Sprintf("os=%d", req.Os))
-	paramBuf.WriteString(fmt.Sprintf("unitId=%s", adInfo.UnitId))
-	paramBuf.WriteString(fmt.Sprintf("creativeId=%s", adInfo.CreativeId))
+	paramBuf.WriteString(fmt.Sprintf("search_id=%s", req.SearchId))
+	paramBuf.WriteString(fmt.Sprintf("&slot_id=%d", req.SlotId))
+	paramBuf.WriteString(fmt.Sprintf("&ip=%s", req.Ip))
+	paramBuf.WriteString(fmt.Sprintf("&device_id=%s", req.DeviceId))
+	paramBuf.WriteString(fmt.Sprintf("&os=%d", req.Os))
+	paramBuf.WriteString(fmt.Sprintf("&os_version=%s", req.OsVersion))
+	paramBuf.WriteString(fmt.Sprintf("&unit_id=%d", adInfo.UnitId))
+	paramBuf.WriteString(fmt.Sprintf("&creative_id=%d", adInfo.CreativeId))
 	paramEncoded := base64.StdEncoding.EncodeToString(paramBuf.Bytes())
 	impressionTrackUrl := fmt.Sprintf("%s?i=%s",
-		"http://localhost:8001/ad/impression", paramEncoded)
+		adserver.GlobalConfObject.ImpressionTrackUrlPrefix, paramEncoded)
+	return impressionTrackUrl
+}
+
+func buildClickTrackUrl(req *adserver.Request, adInfo adserver.AdInfo) string {
+	var paramBuf bytes.Buffer
+	paramBuf.WriteString(fmt.Sprintf("search_id=%s", req.SearchId))
+	paramBuf.WriteString(fmt.Sprintf("&slot_id=%d", req.SlotId))
+	paramBuf.WriteString(fmt.Sprintf("&ip=%s", req.Ip))
+	paramBuf.WriteString(fmt.Sprintf("&device_id=%s", req.DeviceId))
+	paramBuf.WriteString(fmt.Sprintf("&os=%d", req.Os))
+	paramBuf.WriteString(fmt.Sprintf("&os_version=%s", req.OsVersion))
+	paramBuf.WriteString(fmt.Sprintf("&unit_id=%d", adInfo.UnitId))
+	paramBuf.WriteString(fmt.Sprintf("&creative_id=%d", adInfo.CreativeId))
+	paramBuf.WriteString(fmt.Sprintf("&click_url=%s", adInfo.ClickUrl))
+	paramEncoded := base64.StdEncoding.EncodeToString(paramBuf.Bytes())
+	impressionTrackUrl := fmt.Sprintf("%s?i=%s",
+		adserver.GlobalConfObject.ClickTrackUrlPrefix, paramEncoded)
 	return impressionTrackUrl
 }
 
