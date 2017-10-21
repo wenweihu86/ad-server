@@ -1,15 +1,14 @@
 package adhandler
+
 import (
 	"net/http"
 	"strconv"
-	//"math/rand"
 	"adserver"
     "encoding/base64"
-	"github.com/ibbd-dev/go-async-log"
+	"fmt"
 )
-var logfileClick = asyncLog.NewLogFile("./log/click/click.log")
-func ClickHandler(w http.ResponseWriter, r *http.Request) {	
-	
+
+func ClickHandler(w http.ResponseWriter, r *http.Request) {
 	//获得编码后的查询字符串
 	queryStringEncoded := r.URL.RawQuery
 	//解码
@@ -24,17 +23,17 @@ func ClickHandler(w http.ResponseWriter, r *http.Request) {
 	// app_id
 	if len(r.Form["app_id"]) > 0 {
 		appId, _ := strconv.ParseUint(r.Form["app_id"][0], 10, 32)
-		req.AppId = uint(appId)
+		req.AppId = uint32(appId)
 	}
 	// slot_id
 	if len(r.Form["slot_id"]) > 0 {
 		slotId, _ := strconv.ParseUint(r.Form["slot_id"][0], 10, 32)
-		req.SlotId = uint(slotId)
+		req.SlotId = uint32(slotId)
 	}
 	// ad_num
 	if len(r.Form["ad_num"]) > 0 {
 		adNum, _ := strconv.ParseUint(r.Form["ad_num"][0], 10, 32)
-		req.AdNum = uint(adNum)
+		req.AdNum = uint32(adNum)
 	}
 	// ip
 	if len(r.Form["ip"]) > 0 {
@@ -47,7 +46,7 @@ func ClickHandler(w http.ResponseWriter, r *http.Request) {
 	// os
 	if len(r.Form["os"]) > 0 {
 		os, _ := strconv.ParseUint(r.Form["os"][0], 10, 32)
-		req.Os = uint(os)
+		req.Os = uint32(os)
 	}
 	// os_version
 	if len(r.Form["os_version"]) > 0 {
@@ -56,11 +55,13 @@ func ClickHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	//unit_id
 	if len(r.Form["unit_id"]) > 0 {
-		req.UnitId = r.Form["unit_id"][0]
+		unit, _ := strconv.ParseUint(r.Form["unit_id"][0], 10, 32)
+		req.UnitId = uint32(unit)
 	}
 	//creative_id
 	if len(r.Form["creative_id"]) > 0 {
-		req.CreativeId = r.Form["creative_id"][0]
+		creativeId, _ := strconv.ParseUint(r.Form["creative_id"][0], 10, 32)
+		req.CreativeId = uint32(creativeId)
 	}
 	//search_id
 	if len(r.Form["search_id"]) > 0 {
@@ -70,8 +71,8 @@ func ClickHandler(w http.ResponseWriter, r *http.Request) {
 	if len(r.Form["click_url"]) > 0 {
 		req.ClickUrl = r.Form["click_url"][0]
 	}
-	err= logfileClick.Write("i am click")
-	if err!=nil{
-		return
-	}
+	adserver.ClickLog.Info(fmt.Sprintf(
+		"searchId=%s slotId=%d ip=%s os=%d unit_id=%d creativeId=%d",
+		req.SearchId, req.SlotId, req.Ip, req.Os, req.UnitId, req.CreativeId))
+	// TODO: 302跳转到click url
 }

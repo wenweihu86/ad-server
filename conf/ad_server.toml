@@ -1,4 +1,10 @@
-
 GeoBlockFileName = "./data/GeoLiteCity-Blocks.csv"
 GeoLocationFileName = "./data/GeoLiteCity-Location.csv"
 AdFileName = "./data/ad_info.txt"
+
+# 1:debug 2:info 3:warn 4:error 5:fatal
+LogLevel = 1
+AdServerLogFileName = "./log/ad_server.log"
+SearchLogFileName = "./log/ad_search.log"
+ImpressionLogFileName = "./log/ad_impression.log"
+ClickLogFileName = "./log/ad_click.log"

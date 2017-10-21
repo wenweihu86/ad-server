@@ -8,10 +8,11 @@ import (
 
 func main() {
 	adserver.LoadGlobalConf("./conf", "ad_server")
+	adserver.InitLog(adserver.GlobalConfObject)
 	adserver.LoadLocationDict(
 		adserver.GlobalConfObject.GeoBlockFileName,
 		adserver.GlobalConfObject.GeoLocationFileName)
-	adserver.ReadAdDict(adserver.GlobalConfObject.AdFileName)
+	adserver.LoadAdDict(adserver.GlobalConfObject.AdFileName)
 	http.HandleFunc("/ad/search", adhandler.SearchHandler)
 	http.HandleFunc("/ad/impression",adhandler.ImpressionHandler)
 	http.HandleFunc("/ad/click",adhandler.ClickHandler)

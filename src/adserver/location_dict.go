@@ -41,7 +41,8 @@ func init() {
 func LoadLocationDict(blockFileName, locationFileName string) {
 	dictFile, err := os.Open(blockFileName)
 	if err != nil {
-		fmt.Printf("open file error, name=%s\n", blockFileName)
+		AdServerLog.Error(fmt.Sprintf("open file error, name=%s\n", blockFileName))
+		panic(-1)
 	}
 	defer dictFile.Close()
 
@@ -58,8 +59,9 @@ func LoadLocationDict(blockFileName, locationFileName string) {
 		}
 		lines := strings.Split(lineString, ",")
 		if len(lines) != 3 {
-			fmt.Printf("invalid format, blockFileName=%s, line=%s\n",
-				blockFileName, lineString)
+			AdServerLog.Warn(fmt.Sprintf(
+				"invalid format, blockFileName=%s, line=%s\n",
+				blockFileName, lineString))
 			continue
 		}
 
@@ -88,8 +90,11 @@ func LoadLocationDict(blockFileName, locationFileName string) {
 	}
 
 	sort.Sort(LocationDict.ipPairs)
-	fmt.Printf("read dict success, blockFileName=%s locationFileName=%s\n", blockFileName, locationFileName)
-	fmt.Printf("location dict size=%d\n", len(LocationDict.ipPairs))
+	AdServerLog.Info(fmt.Sprintf(
+		"read dict success, blockFileName=%s locationFileName=%s\n",
+		blockFileName, locationFileName))
+	AdServerLog.Info(fmt.Sprintf(
+		"location dict size=%d\n", len(LocationDict.ipPairs)))
 }
 
 func SearchLocationByIp(ipString string) *LocationInfo {
@@ -117,8 +122,9 @@ func SearchLocationByIp(ipString string) *LocationInfo {
 func loadGeoLocation(fileName string) map[uint64]*GeoLocationInfo {
 	dictFile, err := os.Open(fileName)
 	if err != nil {
-		fmt.Printf("open file error, name=%s\n", fileName)
-		return nil
+		AdServerLog.Error(fmt.Sprintf(
+			"open file error, name=%s\n", fileName))
+		panic(-1)
 	}
 	defer dictFile.Close()
 
@@ -136,8 +142,9 @@ func loadGeoLocation(fileName string) map[uint64]*GeoLocationInfo {
 		}
 		lines := strings.Split(lineString, ",")
 		if len(lines) != 9 {
-			fmt.Printf("invalid format, file=%s, line=%s\n",
-				fileName, lineString)
+			AdServerLog.Warn(fmt.Sprintf(
+				"invalid format, file=%s, line=%s\n",
+				fileName, lineString))
 			continue
 		}
 		locId, _ := strconv.ParseUint(lines[0], 10, 64)
@@ -149,6 +156,8 @@ func loadGeoLocation(fileName string) map[uint64]*GeoLocationInfo {
 		geoLocationMap[locId] = geoLocationInfo
 		lineNum++
 	}
-	fmt.Printf("load dict success, file=%s, lineNum=%d\n", fileName, lineNum)
+	AdServerLog.Info(fmt.Sprintf(
+		"load dict success, file=%s, lineNum=%d\n",
+		fileName, lineNum))
 	return geoLocationMap
 }

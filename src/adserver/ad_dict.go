@@ -40,10 +40,12 @@ func init()  {
 	}
 }
 
-func ReadAdDict(dictFileName string) {
+func LoadAdDict(dictFileName string) {
 	dictFile, err := os.Open(dictFileName)
 	if err != nil {
-		fmt.Printf("open file error, name=%s\n", dictFileName)
+		AdServerLog.Error(fmt.Sprintf(
+			"open file error, name=%s\n", dictFileName))
+		panic(-1)
 	}
 	defer dictFile.Close()
 
@@ -67,8 +69,9 @@ func ReadAdDict(dictFileName string) {
 			}
 			AdDict.AdUnitMap[adUnit.UnitId] = adUnit
 			lineNum++
-			fmt.Printf("read ad unit info, unitId=%d creativeId=%d\n",
-				unitId, creativeId)
+			AdServerLog.Debug(fmt.Sprintf(
+				"read ad unit info, unitId=%d creativeId=%d\n",
+				unitId, creativeId))
 		} else if level == 2 {
 			// creative info
 			creativeId, _ := strconv.ParseUint(lines[1], 10, 32)
@@ -89,11 +92,12 @@ func ReadAdDict(dictFileName string) {
 			}
 			AdDict.AdCreativeMap[adCreative.CreativeId] = adCreative
 			lineNum++
-			fmt.Printf("read ad creative info, creativeId=%d " +
+			AdServerLog.Debug(fmt.Sprintf(
+				"read ad creative info, creativeId=%d " +
 				"title=%s description=%s package=%s iconImageUrl=%s " +
 				"mainImageUrl=%s clickUrl=%s\n",
 				creativeId, title, description, packageName,
-				iconImageUrl, mainImageUrl, clickUrl)
+				iconImageUrl, mainImageUrl, clickUrl))
 		} else if level == 3 {
 			// location target
 			unitId, _ := strconv.ParseUint(lines[1], 10, 32)
@@ -106,10 +110,12 @@ func ReadAdDict(dictFileName string) {
 			}
 			unitIdList = append(unitIdList, uint32(unitId))
 			AdDict.LocationUnitMap[key] = unitIdList
-			fmt.Printf("read location target info, unitId=%d country=%s city=%s\n",
-				unitId, country, city)
+			AdServerLog.Debug(fmt.Sprintf(
+				"read location target info, unitId=%d country=%s city=%s\n",
+				unitId, country, city))
 			lineNum++
 		}
 	}
-	fmt.Printf("read ad info file success, lineNum=%d\n", lineNum)
+	AdServerLog.Info(fmt.Sprintf(
+		"read ad info file success, lineNum=%d\n", lineNum))
 }

@@ -1,7 +1,6 @@
 package adhandler
 
 import (
-	"log"
 	"encoding/json"
 	"net/http"
 	"strconv"
@@ -20,17 +19,17 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 	// app_id
 	if len(r.Form["app_id"]) > 0 {
 		appId, _ := strconv.ParseUint(r.Form["app_id"][0], 10, 32)
-		req.AppId = uint(appId)
+		req.AppId = uint32(appId)
 	}
 	// slot_id
 	if len(r.Form["slot_id"]) > 0 {
 		slotId, _ := strconv.ParseUint(r.Form["slot_id"][0], 10, 32)
-		req.SlotId = uint(slotId)
+		req.SlotId = uint32(slotId)
 	}
 	// ad_num
 	if len(r.Form["ad_num"]) > 0 {
 		adNum, _ := strconv.ParseUint(r.Form["ad_num"][0], 10, 32)
-		req.AdNum = uint(adNum)
+		req.AdNum = uint32(adNum)
 	}
 	// ip
 	if len(r.Form["ip"]) > 0 {
@@ -43,7 +42,7 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 	// os
 	if len(r.Form["os"]) > 0 {
 		os, _ := strconv.ParseUint(r.Form["os"][0], 10, 32)
-		req.Os = uint(os)
+		req.Os = uint32(os)
 	}
 	// os_version
 	if len(r.Form["os_version"]) > 0 {
@@ -58,7 +57,8 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 	if locationInfo != nil {
 		country := locationInfo.Country
 		city := locationInfo.City
-		fmt.Printf("ip=%s country=%s city=%s\n", req.Ip, country, city)
+		adserver.AdServerLog.Debug(fmt.Sprintf(
+			"ip=%s country=%s city=%s\n", req.Ip, country, city))
 		key := strings.ToLower(country) + "_" + strings.ToLower(city)
 		unitIdList1, exist1 = adDict.LocationUnitMap[key]
 	}
@@ -106,15 +106,17 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 		adList = append(adList, adInfo)
 		res.ResCode = 0
 		res.AdList = adList
-		log.Printf("appId=%d slotId=%d adNum=%d iP=%s deviceId=%s oS=%d osVersion=%s " +
+		adserver.SearchLog.Info(fmt.Sprintf(
+			"appId=%d slotId=%d adNum=%d iP=%s deviceId=%s oS=%d osVersion=%s " +
 			"unitId=%d creativeId=%d IconImageUrl=%s ClickUrl=%s\n",
 			req.AppId, req.SlotId, req.AdNum, req.Ip, req.DeviceId, req.Os, req.OsVersion,
-			adInfo.UnitId, adInfo.CreativeId, adInfo.IconImageUrl, adInfo.ClickUrl)
+			adInfo.UnitId, adInfo.CreativeId, adInfo.IconImageUrl, adInfo.ClickUrl))
 	} else {
 		res.ResCode = 0
 		res.AdList = make([]adserver.AdInfo, 0, 1)
-		log.Printf("appId=%d slotId=%d adNum=%d iP=%s deviceId=%s oS=%d osVersion=%s resNum=0\n",
-			req.AppId, req.SlotId, req.AdNum, req.Ip, req.DeviceId, req.Os, req.OsVersion)
+		adserver.SearchLog.Info(fmt.Sprintf(
+			"appId=%d slotId=%d adNum=%d iP=%s deviceId=%s oS=%d osVersion=%s resNum=0\n",
+			req.AppId, req.SlotId, req.AdNum, req.Ip, req.DeviceId, req.Os, req.OsVersion))
 	}
 
 	resBytes, _ := json.Marshal(res)

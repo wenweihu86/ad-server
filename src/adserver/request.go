@@ -1,15 +1,15 @@
 package adserver
 
 type Request struct {
-	AppId uint
-	SlotId uint
-	AdNum uint
+	AppId uint32
+	SlotId uint32
+	AdNum uint32
 	Ip string
 	DeviceId string
-	Os uint // 0:android, 1:ios
+	Os uint32 // 0:android, 1:ios
 	OsVersion string
-	UnitId string
-	CreativeId string
+	UnitId uint32
+	CreativeId uint32
 	SearchId string
 	ClickUrl string
 }
