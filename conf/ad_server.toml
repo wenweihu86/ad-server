@@ -1,0 +1,4 @@
+
+GeoBlockFileName = "./data/GeoLiteCity-Blocks.csv"
+GeoLocationFileName = "./data/GeoLiteCity-Location.csv"
+AdFileName = "./data/ad_info.txt"
