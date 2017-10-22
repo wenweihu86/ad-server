@@ -9,8 +9,8 @@ import (
 	"net/url"
 )
 
-// 展现监控handler
-func ImpressionHandler(w http.ResponseWriter, r *http.Request) {
+// 转化监控handler
+func ConversionHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	if len(r.Form["i"]) == 0 {
 		w.Write([]byte("{\"status\": 1}"))
@@ -77,8 +77,8 @@ func ImpressionHandler(w http.ResponseWriter, r *http.Request) {
 		creativeId = uint32(tmp)
 	}
 
-    adserver.ImpressionLog.Info(fmt.Sprintf(
-    	"impression=1 searchId=%s slotId=%d ip=%s deviceId=%s os=%d osVersion=%s unit_id=%d creativeId=%d",
+    adserver.ConversionLog.Info(fmt.Sprintf(
+    	"conversion=1 searchId=%s slotId=%d ip=%s deviceId=%s os=%d osVersion=%s unit_id=%d creativeId=%d",
 		searchId, slotId, ip, deviceId, os, osVersion, unitId, creativeId))
 	res := "{\"status\": 0}"
 	w.Write([]byte(res))

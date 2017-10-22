@@ -16,5 +16,6 @@ func main() {
 	http.HandleFunc("/ad/search", adhandler.SearchHandler)
 	http.HandleFunc("/ad/impression",adhandler.ImpressionHandler)
 	http.HandleFunc("/ad/click",adhandler.ClickHandler)
+	http.HandleFunc("/ad/conversion",adhandler.ConversionHandler)
 	http.ListenAndServe(":8001", nil)
 }

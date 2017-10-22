@@ -11,7 +11,9 @@ AdServerLogFileName = "./log/ad_server.log"
 SearchLogFileName = "./log/ad_search.log"
 ImpressionLogFileName = "./log/ad_impression.log"
 ClickLogFileName = "./log/ad_click.log"
+ConversionLogFileName = "./log/ad_conversion.log"
 
 # track url
 ImpressionTrackUrlPrefix = "http://localhost:8001/ad/impression"
 ClickTrackUrlPrefix = "http://localhost:8001/ad/click"
+ConversionTrackUrlPrefix = "http://localhost:8001/ad/conversion"

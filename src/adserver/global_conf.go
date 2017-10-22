@@ -15,9 +15,11 @@ type GlobalConf struct {
 	SearchLogFileName string
 	ImpressionLogFileName string
 	ClickLogFileName string
+	ConversionLogFileName string
 	// track url prefix
 	ImpressionTrackUrlPrefix string
 	ClickTrackUrlPrefix string
+	ConversionTrackUrlPrefix string
 }
 
 var GlobalConfObject *GlobalConf
@@ -46,6 +48,8 @@ func LoadGlobalConf(configPath, configFileName string)  {
 	fmt.Printf("SearchLogFileName=%s\n", GlobalConfObject.SearchLogFileName)
 	fmt.Printf("ImpressionLogFileName=%s\n", GlobalConfObject.ImpressionLogFileName)
 	fmt.Printf("ClickLogFileName=%s\n", GlobalConfObject.ClickLogFileName)
+	fmt.Printf("ConversionLogFileName=%s\n", GlobalConfObject.ConversionLogFileName)
 	fmt.Printf("ImpressionTrackUrlPrefix=%s\n", GlobalConfObject.ImpressionTrackUrlPrefix)
 	fmt.Printf("ClickTrackUrlPrefix=%s\n", GlobalConfObject.ClickTrackUrlPrefix)
+	fmt.Printf("ConversionTrackUrlPrefix=%s\n", GlobalConfObject.ConversionTrackUrlPrefix)
 }

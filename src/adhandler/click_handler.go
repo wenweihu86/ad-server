@@ -84,7 +84,7 @@ func ClickHandler(w http.ResponseWriter, r *http.Request) {
 	adserver.AdServerLog.Debug(fmt.Sprintf("ClickHandler click_url=%s", clickUrl))
 
 	adserver.ClickLog.Info(fmt.Sprintf(
-		"searchId=%s slotId=%d ip=%s deviceId=%s os=%d osVersion=%s unit_id=%d creativeId=%d",
+		"click=1 searchId=%s slotId=%d ip=%s deviceId=%s os=%d osVersion=%s unit_id=%d creativeId=%d",
 		searchId, slotId, ip, deviceId, os, osVersion, unitId, creativeId))
 	http.Redirect(w, r, clickUrl, http.StatusFound)
 }

@@ -11,6 +11,7 @@ type AdInfo struct {
 	ClickUrl string
 	ImpressionTrackUrl string
 	ClickTrackUrl string
+	ConversionTrackUrl string
 }
 
 type Response struct {

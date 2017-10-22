@@ -4,8 +4,9 @@ import "github.com/ibbd-dev/go-async-log"
 
 var AdServerLog *asyncLog.LogFile // 除了检索、展现、点击监控外，所以日志都用这个log打印
 var SearchLog *asyncLog.LogFile // 每个检索请求打印一行日志
-var ImpressionLog *asyncLog.LogFile // 每条展现请求打印一行日志
-var ClickLog *asyncLog.LogFile // 每条点击请求打印一行日志
+var ImpressionLog *asyncLog.LogFile // 每个展现请求打印一行日志
+var ClickLog *asyncLog.LogFile // 每个点击请求打印一行日志
+var ConversionLog *asyncLog.LogFile // 每个转化请求打印一行日志
 
 /*
 *  ibbd-dev/go-async-log 日志框架说明
@@ -23,5 +24,7 @@ func InitLog(globalConfObject *GlobalConf) {
 	ImpressionLog = asyncLog.NewLevelLog(globalConfObject.ImpressionLogFileName,
 		asyncLog.LevelInfo)
 	ClickLog = asyncLog.NewLevelLog(globalConfObject.ClickLogFileName,
+		asyncLog.LevelInfo)
+	ConversionLog = asyncLog.NewLevelLog(globalConfObject.ConversionLogFileName,
 		asyncLog.LevelInfo)
 }

@@ -102,6 +102,7 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		adInfo.ImpressionTrackUrl = buildImpressionTrackUrl(req, adInfo)
 		adInfo.ClickTrackUrl = buildClickTrackUrl(req, adInfo)
+		adInfo.ConversionTrackUrl = buildConversionTrackUrl(req, adInfo)
 		adList := make([]adserver.AdInfo, 0, 1)
 		adList = append(adList, adInfo)
 		res.ResCode = 0
@@ -154,5 +155,22 @@ func buildClickTrackUrl(req *adserver.Request, adInfo adserver.AdInfo) string {
 	impressionTrackUrl := fmt.Sprintf("%s?i=%s",
 		adserver.GlobalConfObject.ClickTrackUrlPrefix, paramEncoded)
 	return impressionTrackUrl
+}
+
+func buildConversionTrackUrl(req *adserver.Request, adInfo adserver.AdInfo) string {
+	var paramBuf bytes.Buffer
+	paramBuf.WriteString(fmt.Sprintf("search_id=%s", req.SearchId))
+	paramBuf.WriteString(fmt.Sprintf("&slot_id=%d", req.SlotId))
+	paramBuf.WriteString(fmt.Sprintf("&ip=%s", req.Ip))
+	paramBuf.WriteString(fmt.Sprintf("&device_id=%s", req.DeviceId))
+	paramBuf.WriteString(fmt.Sprintf("&os=%d", req.Os))
+	paramBuf.WriteString(fmt.Sprintf("&os_version=%s", req.OsVersion))
+	paramBuf.WriteString(fmt.Sprintf("&unit_id=%d", adInfo.UnitId))
+	paramBuf.WriteString(fmt.Sprintf("&creative_id=%d", adInfo.CreativeId))
+	paramBuf.WriteString(fmt.Sprintf("&click_url=%s", adInfo.ClickUrl))
+	paramEncoded := base64.StdEncoding.EncodeToString(paramBuf.Bytes())
+	conversionTrackUrl := fmt.Sprintf("%s?i=%s",
+		adserver.GlobalConfObject.ConversionTrackUrlPrefix, paramEncoded)
+	return conversionTrackUrl
 }
 
