@@ -4,6 +4,8 @@ GeoLocationFileName = "./data/GeoLiteCity-Location.csv"
 
 # 广告字典
 AdFileName = "./data/ad_info.txt"
+# 广告文件重加载时间间隔，单位秒
+AdFileReloadInterval = 1
 
 # 1:debug 2:info 3:warn 4:error 5:fatal
 LogLevel = 1

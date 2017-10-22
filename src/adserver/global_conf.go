@@ -9,6 +9,7 @@ type GlobalConf struct {
 	GeoBlockFileName string
 	GeoLocationFileName string
 	AdFileName string
+	AdFileReloadInterval int64
 	// log config
 	LogLevel int
 	AdServerLogFileName string
@@ -43,6 +44,7 @@ func LoadGlobalConf(configPath, configFileName string)  {
 	fmt.Printf("GeoBlockFileName=%s\n", GlobalConfObject.GeoBlockFileName)
 	fmt.Printf("GeoLocationFileName=%s\n", GlobalConfObject.GeoLocationFileName)
 	fmt.Printf("AdFileName=%s\n", GlobalConfObject.AdFileName)
+	fmt.Printf("AdFileReloadInterval=%d\n", GlobalConfObject.AdFileReloadInterval)
 	fmt.Printf("LogLevel=%d\n", GlobalConfObject.LogLevel)
 	fmt.Printf("AdServerLogFileName=%s\n", GlobalConfObject.AdServerLogFileName)
 	fmt.Printf("SearchLogFileName=%s\n", GlobalConfObject.SearchLogFileName)

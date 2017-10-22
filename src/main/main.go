@@ -12,7 +12,12 @@ func main() {
 	adserver.LoadLocationDict(
 		adserver.GlobalConfObject.GeoBlockFileName,
 		adserver.GlobalConfObject.GeoLocationFileName)
-	adserver.LoadAdDict(adserver.GlobalConfObject.AdFileName)
+
+	// 初始化并加载广告信息
+	adserver.AdDictObject = adserver.NewAdDict(adserver.GlobalConfObject.AdFileName)
+	adserver.AdDictObject.Load()
+	adserver.AdDictObject.StartReloadTimer()
+
 	http.HandleFunc("/ad/search", adhandler.SearchHandler)
 	http.HandleFunc("/ad/impression",adhandler.ImpressionHandler)
 	http.HandleFunc("/ad/click",adhandler.ClickHandler)

@@ -48,8 +48,8 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 	// searchId
 	req.SearchId = uuid.NewV4().String()
 
+	adData := adserver.AdDictObject.GetCurrentAdData()
 	// search by request ip
-	adDict := adserver.AdDict
 	var unitIdList1 []uint32
 	var exist1 bool
 	locationInfo := adserver.SearchLocationByIp(req.Ip)
@@ -59,11 +59,11 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 		adserver.AdServerLog.Debug(fmt.Sprintf(
 			"ip=%s country=%s city=%s\n", req.Ip, country, city))
 		key := strings.ToLower(country) + "_" + strings.ToLower(city)
-		unitIdList1, exist1 = adDict.LocationUnitMap[key]
+		unitIdList1, exist1 = adData.LocationUnitMap[key]
 	}
 	// search by CN_ALL
 	key := "cn_all"
-	unitIdList2, exist2 := adDict.LocationUnitMap[key]
+	unitIdList2, exist2 := adData.LocationUnitMap[key]
 	// merge two unit id list
 	unitNum := 0
 	if exist1 {
@@ -87,8 +87,8 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 		random := rand.New(rand.NewSource(time.Now().UnixNano()))
 		randIndex := random.Intn(unitNum)
 		unitId := unitIdList[randIndex]
-		unitInfo := adDict.AdUnitMap[unitId]
-		adCreative := adDict.AdCreativeMap[unitInfo.CreativeId]
+		unitInfo := adData.AdUnitMap[unitId]
+		adCreative := adData.AdCreativeMap[unitInfo.CreativeId]
 
 		adInfo := adserver.AdInfo{
 			UnitId: unitInfo.UnitId,
