@@ -23,8 +23,10 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 		req.SlotId = uint32(slotId)
 	}
 	// ad_num
+	var reqAdNum int
 	if len(r.Form["ad_num"]) > 0 {
 		adNum, _ := strconv.ParseUint(r.Form["ad_num"][0], 10, 32)
+		reqAdNum, _ = strconv.Atoi(r.Form["ad_num"][0])
 		req.AdNum = uint32(adNum)
 	}
 	// ip
@@ -79,46 +81,58 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 	if exist2 && unitIdList2 != nil {
 		copy(unitIdList, unitIdList2)
 	}
-
+     
 	// select one from unit id list
 	var res = &adserver.Response{}
-	if unitIdList != nil {
+	adList := make([]adserver.AdInfo, 0, 1)
+	unitIdMap := make(map[int] bool)
+	var unitIdsStr, creativeIdsStr string 
+	if unitIdList != nil && reqAdNum >= 1 {
 		unitNum = len(unitIdList)
 		random := rand.New(rand.NewSource(time.Now().UnixNano()))
-		randIndex := random.Intn(unitNum)
-		unitId := unitIdList[randIndex]
-		unitInfo := adData.AdUnitMap[unitId]
-		adCreative := adData.AdCreativeMap[unitInfo.CreativeId]
-
-		adInfo := adserver.AdInfo{
-			UnitId: unitInfo.UnitId,
-			CreativeId: adCreative.CreativeId,
-			Title: adCreative.Title,
-			Description: adCreative.Description,
-			AppPackageName: adCreative.AppPackageName,
-			IconImageUrl: adCreative.IconImageUrl,
-			MainImageUrl: adCreative.MainImageUrl,
-			ClickUrl: adCreative.ClickUrl,
+		for i := 0; i < unitNum && i < reqAdNum; i++ {
+			randIndex := random.Intn(unitNum)
+			if unitIdMap[randIndex] {
+				i--
+				continue
+			}
+			unitIdMap[randIndex] = true
+			unitId := unitIdList[randIndex]
+			unitInfo := adData.AdUnitMap[unitId]
+			adCreative := adData.AdCreativeMap[unitInfo.CreativeId]
+			adInfo := adserver.AdInfo{
+				UnitId: unitInfo.UnitId,
+				CreativeId: adCreative.CreativeId,
+				Title: adCreative.Title,
+				Description: adCreative.Description,
+				AppPackageName: adCreative.AppPackageName,
+				IconImageUrl: adCreative.IconImageUrl,
+				MainImageUrl: adCreative.MainImageUrl,
+				ClickUrl: adCreative.ClickUrl,
+			}
+			adInfo.ImpressionTrackUrl = buildImpressionTrackUrl(req, adInfo)
+			adInfo.ClickTrackUrl = buildClickTrackUrl(req, adInfo)
+			adInfo.ConversionTrackUrl = buildConversionTrackUrl(req, adInfo)
+			adList = append(adList, adInfo)
+			if i == unitNum - 1 || i == reqAdNum - 1 {
+				unitIdsStr += fmt.Sprint(adInfo.UnitId)
+				creativeIdsStr += fmt.Sprint(adInfo.CreativeId)
+			} else {
+				unitIdsStr += fmt.Sprint(adInfo.UnitId) + ","
+				creativeIdsStr += fmt.Sprint(adInfo.CreativeId) + ","
+			}
 		}
-		adInfo.ImpressionTrackUrl = buildImpressionTrackUrl(req, adInfo)
-		adInfo.ClickTrackUrl = buildClickTrackUrl(req, adInfo)
-		adInfo.ConversionTrackUrl = buildConversionTrackUrl(req, adInfo)
-		adList := make([]adserver.AdInfo, 0, 1)
-		adList = append(adList, adInfo)
 		res.ResCode = 0
 		res.AdList = adList
-		adserver.SearchLog.Info(fmt.Sprintf(
-			"searchId=%s slotId=%d adNum=%d iP=%s deviceId=%s oS=%d osVersion=%s " +
-			"unitId=%d creativeId=%d\n",
-			req.SearchId, req.SlotId, req.AdNum, req.Ip, req.DeviceId, req.Os, req.OsVersion,
-			adInfo.UnitId, adInfo.CreativeId))
 	} else {
 		res.ResCode = 0
 		res.AdList = make([]adserver.AdInfo, 0, 1)
-		adserver.SearchLog.Info(fmt.Sprintf(
-			"searchId=%s slotId=%d adNum=%d iP=%s deviceId=%s oS=%d osVersion=%s resNum=0\n",
-			req.SearchId, req.SlotId, req.AdNum, req.Ip, req.DeviceId, req.Os, req.OsVersion))
 	}
+    adserver.SearchLog.Info(fmt.Sprintf(
+			"searchId=%s slotId=%d adNum=%d iP=%s deviceId=%s oS=%d osVersion=%s " +
+			"unitId=%s creativeId=%s\n",
+			req.SearchId, req.SlotId, req.AdNum, req.Ip, req.DeviceId, req.Os, req.OsVersion,
+			unitIdsStr, creativeIdsStr))
 
 	resBytes, _ := json.Marshal(res)
 	w.Write(resBytes)
