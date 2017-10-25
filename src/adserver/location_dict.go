@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"sort"
 	"utils"
+	"time"
 )
 
 type GeoLocationInfo struct {
@@ -24,21 +25,51 @@ type LocationInfo struct {
 	City string
 }
 
-type IpDict struct {
+type IpDataInfo struct {
 	ipPairs utils.IpPairs
 	ipLocationMap map[utils.IpPair]*LocationInfo
+}
+
+type IpDict struct {
+	IpDataArray []*IpDataInfo
+	CurrentIndex uint32
+	BlockLastModifiedTime int64
+	LocationLastModifiedTime int64
 }
 
 var LocationDict *IpDict
 
 func init() {
 	LocationDict = &IpDict{
+		IpDataArray: make([]*IpDataInfo, 2, 2),
+		CurrentIndex: 0,
+		BlockLastModifiedTime: 0,
+		LocationLastModifiedTime: 0,
+	}
+	for i := 0; i < 2; i++ {
+		LocationDict.IpDataArray[i] = NewIpDataInfo()
+	}
+}
+
+// 初始化之后首次加载Ip字典信息
+func (ipDict *IpDict) Load() {
+	ipDataInfo := LoadLocationDict(GlobalConfObject.GeoBlockFileName,
+		GlobalConfObject.GeoLocationFileName)
+	ipDict.IpDataArray[ipDict.CurrentIndex] = ipDataInfo
+	blockFileStat, _ := os.Stat(GlobalConfObject.GeoBlockFileName)
+    locationFileStat, _ := os.Stat(GlobalConfObject.GeoLocationFileName)
+	ipDict.BlockLastModifiedTime = blockFileStat.ModTime().Unix()
+	ipDict.LocationLastModifiedTime = locationFileStat.ModTime().Unix()
+}
+
+func NewIpDataInfo() *IpDataInfo {
+	return &IpDataInfo{
 		ipPairs: make(utils.IpPairs, 0),
 		ipLocationMap: make(map[utils.IpPair]*LocationInfo),
 	}
 }
 
-func LoadLocationDict(blockFileName, locationFileName string) {
+func LoadLocationDict(blockFileName, locationFileName string) *IpDataInfo {
 	dictFile, err := os.Open(blockFileName)
 	if err != nil {
 		AdServerLog.Error(fmt.Sprintf("open file error, name=%s\n", blockFileName))
@@ -46,6 +77,7 @@ func LoadLocationDict(blockFileName, locationFileName string) {
 	}
 	defer dictFile.Close()
 
+	ipDataInfo := NewIpDataInfo()
 	geoLocationMap := loadGeoLocation(locationFileName)
 	br := bufio.NewReader(dictFile)
 	for {
@@ -85,21 +117,55 @@ func LoadLocationDict(blockFileName, locationFileName string) {
 			BeginIp: beginIp,
 			EndIp: endIp,
 		}
-		LocationDict.ipPairs = append(LocationDict.ipPairs, ipPair)
-		LocationDict.ipLocationMap[ipPair] = locationInfo
+		ipDataInfo.ipPairs = append(ipDataInfo.ipPairs, ipPair)
+		ipDataInfo.ipLocationMap[ipPair] = locationInfo
 	}
 
-	sort.Sort(LocationDict.ipPairs)
+	sort.Sort(ipDataInfo.ipPairs)
 	AdServerLog.Info(fmt.Sprintf(
 		"read dict success, blockFileName=%s locationFileName=%s\n",
 		blockFileName, locationFileName))
 	AdServerLog.Info(fmt.Sprintf(
-		"location dict size=%d\n", len(LocationDict.ipPairs)))
+		"location dict size=%d\n", len(ipDataInfo.ipPairs)))
+
+	return ipDataInfo
 }
 
-func SearchLocationByIp(ipString string) *LocationInfo {
+// 启动定时器，用于定期重新加载Ip字典信息
+func (locationDict *IpDict) StartReloadTimer() {
+	duration := int64(time.Second) * GlobalConfObject.IpFileReloadInterval
+	t := time.NewTicker(time.Duration(duration))
+	go func() {
+		for t1 := range t.C {
+			AdServerLog.Debug("IpDict reload timer execute")
+			blockFileStat, _ := os.Stat(GlobalConfObject.GeoBlockFileName)
+			locationFileStat, _ := os.Stat(GlobalConfObject.GeoLocationFileName)
+			blockCurrentModifiedTime := blockFileStat.ModTime().Unix()
+			locationCurrentModifiedTime := locationFileStat.ModTime().Unix()
+			// 如果文件有更新，则重新加载广告内容
+			if blockCurrentModifiedTime > locationDict.BlockLastModifiedTime || locationCurrentModifiedTime > locationDict.LocationLastModifiedTime {
+				AdServerLog.Info(fmt.Sprintf("start reload ad info dict at %s",
+					t1.Format("2006-01-02 03:04:05")))
+				LoadLocationDict(
+					GlobalConfObject.GeoBlockFileName,
+					GlobalConfObject.GeoLocationFileName)
+				nextIndex := 1 - locationDict.CurrentIndex
+				locationDict.CurrentIndex = nextIndex
+				locationDict.BlockLastModifiedTime = blockCurrentModifiedTime
+				locationDict.LocationLastModifiedTime = locationCurrentModifiedTime
+			}
+		}
+	}()
+}
+
+// 获取当前可用的Ip字典信息
+func (ipDict *IpDict) GetCurrentIpData() *IpDataInfo {
+	return ipDict.IpDataArray[ipDict.CurrentIndex]
+}
+
+func (ipDataInfo *IpDataInfo) SearchLocationByIp(ipString string) *LocationInfo {
 	ip := utils.StringIpToUint(ipString)
-	ipPairs := LocationDict.ipPairs
+	ipPairs := ipDataInfo.ipPairs
 	size := len(ipPairs)
 	if size == 0 || ip < ipPairs[0].BeginIp || ip > ipPairs[size - 1].EndIp {
 		return nil
@@ -109,7 +175,7 @@ func SearchLocationByIp(ipString string) *LocationInfo {
 	for left <= right {
 		mid := (left + right) / 2
 		if ip >= ipPairs[mid].BeginIp && ip <= ipPairs[mid].EndIp {
-			return LocationDict.ipLocationMap[ipPairs[mid]];
+			return ipDataInfo.ipLocationMap[ipPairs[mid]];
 		} else if ip < ipPairs[mid].BeginIp {
 			right = mid - 1
 		} else if ip > ipPairs[mid].EndIp {

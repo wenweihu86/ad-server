@@ -8,6 +8,7 @@ import (
 type GlobalConf struct {
 	GeoBlockFileName string
 	GeoLocationFileName string
+	IpFileReloadInterval int64
 	AdFileName string
 	AdFileReloadInterval int64
 	// log config
@@ -21,6 +22,7 @@ type GlobalConf struct {
 	ImpressionTrackUrlPrefix string
 	ClickTrackUrlPrefix string
 	ConversionTrackUrlPrefix string
+	AdServerPort int
 }
 
 var GlobalConfObject *GlobalConf
@@ -54,4 +56,5 @@ func LoadGlobalConf(configPath, configFileName string)  {
 	fmt.Printf("ImpressionTrackUrlPrefix=%s\n", GlobalConfObject.ImpressionTrackUrlPrefix)
 	fmt.Printf("ClickTrackUrlPrefix=%s\n", GlobalConfObject.ClickTrackUrlPrefix)
 	fmt.Printf("ConversionTrackUrlPrefix=%s\n", GlobalConfObject.ConversionTrackUrlPrefix)
+	fmt.Printf("AdServerPort=%d\n", GlobalConfObject.AdServerPort)
 }

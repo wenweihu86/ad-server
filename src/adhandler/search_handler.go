@@ -23,11 +23,9 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 		req.SlotId = uint32(slotId)
 	}
 	// ad_num
-	var reqAdNum int
 	if len(r.Form["ad_num"]) > 0 {
-		adNum, _ := strconv.ParseUint(r.Form["ad_num"][0], 10, 32)
-		reqAdNum, _ = strconv.Atoi(r.Form["ad_num"][0])
-		req.AdNum = uint32(adNum)
+		reqAdNum, _ := strconv.ParseUint(r.Form["ad_num"][0], 10, 32)
+		req.ReqAdNum = uint32(reqAdNum)
 	}
 	// ip
 	if len(r.Form["ip"]) > 0 {
@@ -54,7 +52,8 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 	// search by request ip
 	var unitIdList1 []uint32
 	var exist1 bool
-	locationInfo := adserver.SearchLocationByIp(req.Ip)
+	ipDataInfo := adserver.LocationDict.GetCurrentIpData()
+	locationInfo := ipDataInfo.SearchLocationByIp(req.Ip)
 	if locationInfo != nil {
 		country := locationInfo.Country
 		city := locationInfo.City
@@ -86,16 +85,18 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 	var res = &adserver.Response{}
 	adList := make([]adserver.AdInfo, 0, 1)
 	unitIdMap := make(map[int] bool)
-	var unitIdsStr, creativeIdsStr string 
-	if unitIdList != nil && reqAdNum >= 1 {
+	var unitIdsStr, creativeIdsStr string
+	resAdNum := 0 
+	if unitIdList != nil && req.ReqAdNum >= 1 {
 		unitNum = len(unitIdList)
 		random := rand.New(rand.NewSource(time.Now().UnixNano()))
-		for i := 0; i < unitNum && i < reqAdNum; i++ {
+		for i := 0; i < unitNum && i < int(req.ReqAdNum); i++ {
 			randIndex := random.Intn(unitNum)
 			if unitIdMap[randIndex] {
 				i--
 				continue
 			}
+			resAdNum++
 			unitIdMap[randIndex] = true
 			unitId := unitIdList[randIndex]
 			unitInfo := adData.AdUnitMap[unitId]
@@ -114,7 +115,7 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 			adInfo.ClickTrackUrl = buildClickTrackUrl(req, adInfo)
 			adInfo.ConversionTrackUrl = buildConversionTrackUrl(req, adInfo)
 			adList = append(adList, adInfo)
-			if i == unitNum - 1 || i == reqAdNum - 1 {
+			if i == unitNum - 1 || i == int(req.ReqAdNum) - 1 {
 				unitIdsStr += fmt.Sprint(adInfo.UnitId)
 				creativeIdsStr += fmt.Sprint(adInfo.CreativeId)
 			} else {
@@ -130,9 +131,9 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 	}
     adserver.SearchLog.Info(fmt.Sprintf(
 			"searchId=%s slotId=%d adNum=%d iP=%s deviceId=%s oS=%d osVersion=%s " +
-			"unitId=%s creativeId=%s\n",
-			req.SearchId, req.SlotId, req.AdNum, req.Ip, req.DeviceId, req.Os, req.OsVersion,
-			unitIdsStr, creativeIdsStr))
+			"unitId=%s creativeId=%s resAdNum=%d\n",
+			req.SearchId, req.SlotId, req.ReqAdNum, req.Ip, req.DeviceId, req.Os, req.OsVersion,
+			unitIdsStr, creativeIdsStr,resAdNum))
 
 	resBytes, _ := json.Marshal(res)
 	w.Write(resBytes)

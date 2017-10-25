@@ -1,6 +1,7 @@
 # ip字典
 GeoBlockFileName = "./data/GeoLiteCity-Blocks.csv"
 GeoLocationFileName = "./data/GeoLiteCity-Location.csv"
+IpFileReloadInterval = 1
 
 # 广告字典
 AdFileName = "./data/ad_info.txt"
@@ -19,3 +20,6 @@ ConversionLogFileName = "./log/ad_conversion.log"
 ImpressionTrackUrlPrefix = "http://localhost:8001/ad/impression"
 ClickTrackUrlPrefix = "http://localhost:8001/ad/click"
 ConversionTrackUrlPrefix = "http://localhost:8001/ad/conversion"
+
+#adserver config
+AdServerPort = 8001
