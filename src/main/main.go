@@ -5,19 +5,26 @@ import (
 	"adserver"
 	"adhandler"
 	"strconv"
+	"os"
 )
 
 func main() {
 	adserver.LoadGlobalConf("./conf", "ad_server")
 	adserver.InitLog(adserver.GlobalConfObject)
 	//加载位置字典
-	adserver.LocationDict.Load()
+	err := adserver.LocationDict.Load()
+	if err != nil {
+		os.Exit(-1)
+	}
 	adserver.LocationDict.StartReloadTimer()
 	
 
 	// 初始化并加载广告信息
 	adserver.AdDictObject = adserver.NewAdDict(adserver.GlobalConfObject.AdFileName)
-	adserver.AdDictObject.Load()
+	err = adserver.AdDictObject.Load()
+	if err != nil {
+		os.Exit(-1)
+	}
 	adserver.AdDictObject.StartReloadTimer()
 
 	http.HandleFunc("/ad/search", adhandler.SearchHandler)

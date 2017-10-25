@@ -52,14 +52,18 @@ func init() {
 }
 
 // 初始化之后首次加载Ip字典信息
-func (ipDict *IpDict) Load() {
-	ipDataInfo := LoadLocationDict(GlobalConfObject.GeoBlockFileName,
+func (ipDict *IpDict) Load() error {
+	ipDataInfo,err := LoadLocationDict(GlobalConfObject.GeoBlockFileName,
 		GlobalConfObject.GeoLocationFileName)
+	if err != nil {
+		return err
+	}
 	ipDict.IpDataArray[ipDict.CurrentIndex] = ipDataInfo
 	blockFileStat, _ := os.Stat(GlobalConfObject.GeoBlockFileName)
     locationFileStat, _ := os.Stat(GlobalConfObject.GeoLocationFileName)
 	ipDict.BlockLastModifiedTime = blockFileStat.ModTime().Unix()
 	ipDict.LocationLastModifiedTime = locationFileStat.ModTime().Unix()
+	return nil
 }
 
 func NewIpDataInfo() *IpDataInfo {
@@ -69,16 +73,19 @@ func NewIpDataInfo() *IpDataInfo {
 	}
 }
 
-func LoadLocationDict(blockFileName, locationFileName string) *IpDataInfo {
+func LoadLocationDict(blockFileName, locationFileName string) (*IpDataInfo, error) {
 	dictFile, err := os.Open(blockFileName)
 	if err != nil {
 		AdServerLog.Error(fmt.Sprintf("open file error, name=%s\n", blockFileName))
-		panic(-1)
+		return nil, err
 	}
 	defer dictFile.Close()
 
 	ipDataInfo := NewIpDataInfo()
-	geoLocationMap := loadGeoLocation(locationFileName)
+	geoLocationMap, err := loadGeoLocation(locationFileName)
+	if err != nil {
+		return nil, err
+	}
 	br := bufio.NewReader(dictFile)
 	for {
 		line, _, err := br.ReadLine()
@@ -128,7 +135,7 @@ func LoadLocationDict(blockFileName, locationFileName string) *IpDataInfo {
 	AdServerLog.Info(fmt.Sprintf(
 		"location dict size=%d\n", len(ipDataInfo.ipPairs)))
 
-	return ipDataInfo
+	return ipDataInfo, nil
 }
 
 // 启动定时器，用于定期重新加载Ip字典信息
@@ -146,9 +153,12 @@ func (locationDict *IpDict) StartReloadTimer() {
 			if blockCurrentModifiedTime > locationDict.BlockLastModifiedTime || locationCurrentModifiedTime > locationDict.LocationLastModifiedTime {
 				AdServerLog.Info(fmt.Sprintf("start reload ad info dict at %s",
 					t1.Format("2006-01-02 03:04:05")))
-				LoadLocationDict(
+				_, err := LoadLocationDict(
 					GlobalConfObject.GeoBlockFileName,
 					GlobalConfObject.GeoLocationFileName)
+				if err != nil {
+					continue
+				}
 				nextIndex := 1 - locationDict.CurrentIndex
 				locationDict.CurrentIndex = nextIndex
 				locationDict.BlockLastModifiedTime = blockCurrentModifiedTime
@@ -185,12 +195,12 @@ func (ipDataInfo *IpDataInfo) SearchLocationByIp(ipString string) *LocationInfo 
 	return nil
 }
 
-func loadGeoLocation(fileName string) map[uint64]*GeoLocationInfo {
+func loadGeoLocation(fileName string) (map[uint64]*GeoLocationInfo, error) {
 	dictFile, err := os.Open(fileName)
 	if err != nil {
 		AdServerLog.Error(fmt.Sprintf(
-			"open file error, name=%s\n", fileName))
-		panic(-1)
+		   "open file error, name=%s\n", fileName))
+		return nil, err
 	}
 	defer dictFile.Close()
 
@@ -225,5 +235,5 @@ func loadGeoLocation(fileName string) map[uint64]*GeoLocationInfo {
 	AdServerLog.Info(fmt.Sprintf(
 		"load dict success, file=%s, lineNum=%d\n",
 		fileName, lineNum))
-	return geoLocationMap
+	return geoLocationMap, nil
 }

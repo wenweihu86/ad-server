@@ -33,7 +33,10 @@ func StringIpToUint(ipstring string) uint32 {
 	var ipInt uint32 = 0
 	var pos uint32 = 24
 	for _, ipSeg := range ipSegs {
-		tempInt, _ := strconv.ParseUint(ipSeg, 10, 32)
+		tempInt, err := strconv.ParseUint(ipSeg, 10, 32)
+		if err !=nil {
+			panic(-1)
+		}
 		intSeg := (uint32(tempInt)) << pos
 		ipInt = ipInt | intSeg
 		pos -= 8

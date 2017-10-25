@@ -19,11 +19,15 @@ func ConversionHandler(w http.ResponseWriter, r *http.Request) {
 	i := r.Form["i"][0]
 	queryStringBytes, err := base64.StdEncoding.DecodeString(i)
 	if err != nil {
-		w.Write([]byte("{\"status\": 1}"))
+		w.Write([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
 		return
 	}
 	queryString := string(queryStringBytes)
-	paramMap, _ := url.ParseQuery(queryString)
+	paramMap, err := url.ParseQuery(queryString)
+	if err != nil {
+		w.Write([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
+		return 
+	}
 
 	// search_id
 	var searchId string
@@ -34,7 +38,11 @@ func ConversionHandler(w http.ResponseWriter, r *http.Request) {
 	// slot_id
 	var slotId uint32
 	if slotIds, exist := paramMap["slot_id"]; exist {
-		tmpInt, _ := strconv.ParseUint(slotIds[0], 10, 32)
+		tmpInt, err := strconv.ParseUint(slotIds[0], 10, 32)
+		if err != nil {
+			w.Write([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
+			return 
+		}
 		slotId = uint32(tmpInt)
 	}
 
@@ -53,7 +61,11 @@ func ConversionHandler(w http.ResponseWriter, r *http.Request) {
 	// os
 	var os uint32
 	if osString, exist := paramMap["os"]; exist {
-		tmpInt, _ := strconv.ParseUint(osString[0], 10, 32)
+		tmpInt, err := strconv.ParseUint(osString[0], 10, 32)
+		if err != nil {
+			w.Write([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
+			return 
+		}
 		os = uint32(tmpInt)
 	}
 
@@ -66,14 +78,22 @@ func ConversionHandler(w http.ResponseWriter, r *http.Request) {
 	// unit_id
 	var unitId uint32
 	if unitIdString, exist := paramMap["unit_id"]; exist {
-		tmpInt, _ := strconv.ParseUint(unitIdString[0], 10, 32)
+		tmpInt, err := strconv.ParseUint(unitIdString[0], 10, 32)
+		if err != nil {
+			w.Write([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
+			return 
+		}
 		unitId = uint32(tmpInt)
 	}
 
 	// creative_id
 	var creativeId uint32
 	if creativeIdString, exist := paramMap["creative_id"]; exist {
-		tmp, _ := strconv.ParseUint(creativeIdString[0], 10, 32)
+		tmp, err := strconv.ParseUint(creativeIdString[0], 10, 32)
+		if err != nil {
+			w.Write([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
+			return 
+		}
 		creativeId = uint32(tmp)
 	}
 

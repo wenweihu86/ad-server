@@ -19,12 +19,20 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 	req := new(adserver.Request)
 	// slot_id
 	if len(r.Form["slot_id"]) > 0 {
-		slotId, _ := strconv.ParseUint(r.Form["slot_id"][0], 10, 32)
+		slotId, err := strconv.ParseUint(r.Form["slot_id"][0], 10, 32)
+		if err != nil {
+			w.Write([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
+			return 
+		}
 		req.SlotId = uint32(slotId)
 	}
 	// ad_num
 	if len(r.Form["ad_num"]) > 0 {
-		reqAdNum, _ := strconv.ParseUint(r.Form["ad_num"][0], 10, 32)
+		reqAdNum, err := strconv.ParseUint(r.Form["ad_num"][0], 10, 32)
+		if err != nil {
+			w.Write([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
+			return 
+		}
 		req.ReqAdNum = uint32(reqAdNum)
 	}
 	// ip
@@ -37,7 +45,11 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	// os
 	if len(r.Form["os"]) > 0 {
-		os, _ := strconv.ParseUint(r.Form["os"][0], 10, 32)
+		os, err := strconv.ParseUint(r.Form["os"][0], 10, 32)
+		if err != nil {
+			w.Write([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
+			return 
+		}
 		req.Os = uint32(os)
 	}
 	// os_version
@@ -135,7 +147,11 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 			req.SearchId, req.SlotId, req.ReqAdNum, req.Ip, req.DeviceId, req.Os, req.OsVersion,
 			unitIdsStr, creativeIdsStr,resAdNum))
 
-	resBytes, _ := json.Marshal(res)
+	resBytes, err := json.Marshal(res)
+	if err != nil {
+		w.Write([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
+		return 
+	}
 	w.Write(resBytes)
 }
 

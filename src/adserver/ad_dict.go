@@ -63,11 +63,18 @@ func NewAdDict(dictFileName string) *AdDict {
 }
 
 // 初始化之后首次加载广告信息
-func (ad *AdDict) Load() {
-	adDataInfo := ad.loadAdDict()
+func (ad *AdDict) Load() error {
+	adDataInfo, err := ad.loadAdDict()
+	if err != nil {
+		return err
+	}
 	ad.AdDataArray[ad.CurrentIndex] = adDataInfo
-	fileStat, _ := os.Stat(ad.FileName)
+	fileStat, err := os.Stat(ad.FileName)
+	if err != nil {
+		return err
+	}
 	ad.LastModifiedTime = fileStat.ModTime().Unix()
+	return nil
 }
 
 // 启动定时器，用于定期重新加载广告信息
@@ -83,7 +90,10 @@ func (ad *AdDict) StartReloadTimer() {
 			if currentModifiedTime > ad.LastModifiedTime {
 				AdServerLog.Info(fmt.Sprintf("start reload ad info dict at %s",
 					t1.Format("2006-01-02 03:04:05")))
-				adDataInfo := ad.loadAdDict()
+				adDataInfo,err := ad.loadAdDict()
+				if err != nil {
+					continue
+				}
 				nextIndex := 1 - ad.CurrentIndex
 				ad.AdDataArray[nextIndex] = adDataInfo
 				ad.CurrentIndex = nextIndex
@@ -98,12 +108,12 @@ func (ad *AdDict) GetCurrentAdData() *AdDataInfo {
 	return ad.AdDataArray[ad.CurrentIndex]
 }
 
-func (ad *AdDict) loadAdDict() *AdDataInfo {
+func (ad *AdDict) loadAdDict() (*AdDataInfo, error) {
 	dictFile, err := os.Open(ad.FileName)
 	if err != nil {
 		AdServerLog.Error(fmt.Sprintf(
 			"open file error, name=%s\n", ad.FileName))
-		panic(-1)
+		return nil, err
 	}
 	defer dictFile.Close()
 
@@ -117,11 +127,20 @@ func (ad *AdDict) loadAdDict() *AdDataInfo {
 		}
 		lineString := string(line)
 		lines := strings.Split(lineString, "\t")
-		level, _ := strconv.Atoi(lines[0])
+		level, err := strconv.Atoi(lines[0])
+		if err != nil {
+			return nil, err
+		}
 		if level == 1 {
 			// ad unit info
-			unitId, _ := strconv.ParseUint(lines[1], 10, 32)
-			creativeId, _ := strconv.ParseUint(lines[2], 10, 32)
+			unitId, err := strconv.ParseUint(lines[1], 10, 32)
+			if err != nil {
+				return nil, err
+			}
+			creativeId, err := strconv.ParseUint(lines[2], 10, 32)
+			if err != nil {
+				return nil, err
+			}
 			adUnit := AdUnitInfo{
 				UnitId: uint32(unitId),
 				CreativeId: uint32(creativeId),
@@ -179,5 +198,5 @@ func (ad *AdDict) loadAdDict() *AdDataInfo {
 	}
 	AdServerLog.Info(fmt.Sprintf(
 		"read ad info file success, lineNum=%d\n", lineNum))
-	return adDataInfo
+	return adDataInfo, nil
 }

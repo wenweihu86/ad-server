@@ -22,7 +22,11 @@ func ClickHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	queryString := string(queryStringBytes)
-	paramMap, _ := url.ParseQuery(queryString)
+	paramMap, err := url.ParseQuery(queryString)
+	if err != nil {
+		w.Write([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
+		return 
+	}
 
 	// search_id
 	var searchId string
@@ -33,7 +37,11 @@ func ClickHandler(w http.ResponseWriter, r *http.Request) {
 	// slot_id
 	var slotId uint32
 	if slotIds, exist := paramMap["slot_id"]; exist {
-		tmpInt, _ := strconv.ParseUint(slotIds[0], 10, 32)
+		tmpInt, err := strconv.ParseUint(slotIds[0], 10, 32)
+		if err != nil {
+			w.Write([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
+		return 
+	}
 		slotId = uint32(tmpInt)
 	}
 
