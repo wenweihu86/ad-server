@@ -2,8 +2,8 @@ package main
 
 import (
 	"net/http"
-	"adserver"
-	"adhandler"
+	"github.com/wenweihu86/ad-server/adserver"
+	"github.com/wenweihu86/ad-server/adhandler"
 	"strconv"
 	"os"
 )

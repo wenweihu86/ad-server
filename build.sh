@@ -1,5 +1,4 @@
 #!/bin/bash
 
-export GOPATH=${GOPATH}:`pwd`
-echo $GOPATH
+glide install
 go build -o ad_server src/main/main.go

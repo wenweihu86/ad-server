@@ -3,7 +3,7 @@ package adhandler
 import (
 	"net/http"
 	"strconv"
-	"adserver"
+	"github.com/wenweihu86/ad-server/adserver"
 	"encoding/base64"
 	"fmt"
 	"net/url"

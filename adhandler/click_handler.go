@@ -3,14 +3,13 @@ package adhandler
 import (
 	"net/http"
 	"strconv"
-	"adserver"
-	"encoding/base64"
+	"github.com/wenweihu86/ad-server/adserver"
+    "encoding/base64"
 	"fmt"
 	"net/url"
 )
 
-// 转化监控handler
-func ConversionHandler(w http.ResponseWriter, r *http.Request) {
+func ClickHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	if len(r.Form["i"]) == 0 {
 		w.Write([]byte("{\"status\": 1}"))
@@ -19,7 +18,7 @@ func ConversionHandler(w http.ResponseWriter, r *http.Request) {
 	i := r.Form["i"][0]
 	queryStringBytes, err := base64.StdEncoding.DecodeString(i)
 	if err != nil {
-		w.Write([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
+		w.Write([]byte("{\"status\": 1}"))
 		return
 	}
 	queryString := string(queryStringBytes)
@@ -41,8 +40,8 @@ func ConversionHandler(w http.ResponseWriter, r *http.Request) {
 		tmpInt, err := strconv.ParseUint(slotIds[0], 10, 32)
 		if err != nil {
 			w.Write([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
-			return 
-		}
+		return 
+	}
 		slotId = uint32(tmpInt)
 	}
 
@@ -61,11 +60,7 @@ func ConversionHandler(w http.ResponseWriter, r *http.Request) {
 	// os
 	var os uint32
 	if osString, exist := paramMap["os"]; exist {
-		tmpInt, err := strconv.ParseUint(osString[0], 10, 32)
-		if err != nil {
-			w.Write([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
-			return 
-		}
+		tmpInt, _ := strconv.ParseUint(osString[0], 10, 32)
 		os = uint32(tmpInt)
 	}
 
@@ -78,28 +73,26 @@ func ConversionHandler(w http.ResponseWriter, r *http.Request) {
 	// unit_id
 	var unitId uint32
 	if unitIdString, exist := paramMap["unit_id"]; exist {
-		tmpInt, err := strconv.ParseUint(unitIdString[0], 10, 32)
-		if err != nil {
-			w.Write([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
-			return 
-		}
+		tmpInt, _ := strconv.ParseUint(unitIdString[0], 10, 32)
 		unitId = uint32(tmpInt)
 	}
 
 	// creative_id
 	var creativeId uint32
 	if creativeIdString, exist := paramMap["creative_id"]; exist {
-		tmp, err := strconv.ParseUint(creativeIdString[0], 10, 32)
-		if err != nil {
-			w.Write([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
-			return 
-		}
+		tmp, _ := strconv.ParseUint(creativeIdString[0], 10, 32)
 		creativeId = uint32(tmp)
 	}
 
-    adserver.ConversionLog.Info(fmt.Sprintf(
-    	"conversion=1 searchId=%s slotId=%d ip=%s deviceId=%s os=%d osVersion=%s unit_id=%d creativeId=%d",
+	// click_url
+	var clickUrl string
+	if clickUrls, exist := paramMap["click_url"]; exist {
+		clickUrl = clickUrls[0]
+	}
+	adserver.AdServerLog.Debug(fmt.Sprintf("ClickHandler click_url=%s", clickUrl))
+
+	adserver.ClickLog.Info(fmt.Sprintf(
+		"click=1 searchId=%s slotId=%d ip=%s deviceId=%s os=%d osVersion=%s unit_id=%d creativeId=%d",
 		searchId, slotId, ip, deviceId, os, osVersion, unitId, creativeId))
-	res := "{\"status\": 0}"
-	w.Write([]byte(res))
+	http.Redirect(w, r, clickUrl, http.StatusFound)
 }

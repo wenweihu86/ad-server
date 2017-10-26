@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 	"math/rand"
-	"adserver"
+	"github.com/wenweihu86/ad-server/adserver"
 	"strings"
 	"fmt"
 	"bytes"

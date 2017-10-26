@@ -1,0 +1,5 @@
+package: github.com/wenweihu86/ad-server
+import:
+- package: github.com/ibbd-dev/go-async-log
+- package: github.com/satori/go.uuid
+- package: github.com/spf13/viper
