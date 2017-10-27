@@ -3,3 +3,9 @@ import:
 - package: github.com/ibbd-dev/go-async-log
 - package: github.com/satori/go.uuid
 - package: github.com/spf13/viper
+- package: golang.org/x/sys
+  subpackages:
+  - /unix
+- package: golang.org/x/text
+  subpackages:
+  - /transform

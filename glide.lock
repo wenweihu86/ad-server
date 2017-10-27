@@ -1,0 +1,50 @@
+hash: b29d41755c8a724cb74c23c14a6aaa9512c2ca063d4339d4fea9e269fbb48931
+updated: 2017-10-27T10:20:55.008291701+08:00
+imports:
+- name: github.com/fsnotify/fsnotify
+  version: 4da3e2cfbabc9f751898f250b49f2439785783a1
+- name: github.com/hashicorp/hcl
+  version: 23c074d0eceb2b8a5bfdbb271ab780cde70f05a8
+  subpackages:
+  - hcl/ast
+  - hcl/parser
+  - hcl/scanner
+  - hcl/strconv
+  - hcl/token
+  - json/parser
+  - json/scanner
+  - json/token
+- name: github.com/ibbd-dev/go-async-log
+  version: a5c968f2b3f34c14f4891e51c935a9c634a47df4
+- name: github.com/magiconair/properties
+  version: 8d7837e64d3c1ee4e54a880c5a920ab4316fc90a
+- name: github.com/mitchellh/mapstructure
+  version: 06020f85339e21b2478f756a78e295255ffa4d6a
+- name: github.com/pelletier/go-toml
+  version: 4e9e0ee19b60b13eb79915933f44d8ed5f268bdd
+- name: github.com/satori/go.uuid
+  version: 5bf94b69c6b68ee1b541973bb8e1144db23a194b
+- name: github.com/spf13/afero
+  version: 5660eeed305fe5f69c8fc6cf899132a459a97064
+  subpackages:
+  - mem
+- name: github.com/spf13/cast
+  version: acbeb36b902d72a7a4c18e8f3241075e7ab763e4
+- name: github.com/spf13/jwalterweatherman
+  version: 12bd96e66386c1960ab0f74ced1362f66f552f7b
+- name: github.com/spf13/pflag
+  version: 97afa5e7ca8a08a383cb259e06636b5e2cc7897f
+- name: github.com/spf13/viper
+  version: 8ef37cbca71638bf32f3d5e194117d4cb46da163
+- name: golang.org/x/sys
+  version: 164713f0dfcec4e80be8b53e1f0811f5f0d84578
+  subpackages:
+  - unix
+- name: golang.org/x/text
+  version: 6eab0e8f74e86c598ec3b6fad4888e0c11482d48
+  subpackages:
+  - transform
+  - unicode/norm
+- name: gopkg.in/yaml.v2
+  version: eb3733d160e74a9c7e442f435eb3bea458e1d19f
+testImports: []
