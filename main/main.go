@@ -1,11 +1,11 @@
 package main
 
 import (
-	"net/http"
-	"github.com/wenweihu86/ad-server/adserver"
-	"github.com/wenweihu86/ad-server/adhandler"
-	"strconv"
+	"ad-server/adserver"
+	"ad-server/adhandler"
 	"os"
+	"github.com/valyala/fasthttp"
+	"strconv"
 )
 
 func main() {
@@ -18,7 +18,6 @@ func main() {
 	}
 	adserver.LocationDict.StartReloadTimer()
 	
-
 	// 初始化并加载广告信息
 	adserver.AdDictObject = adserver.NewAdDict(adserver.GlobalConfObject.AdFileName)
 	err = adserver.AdDictObject.Load()
@@ -27,10 +26,20 @@ func main() {
 	}
 	adserver.AdDictObject.StartReloadTimer()
 
-	http.HandleFunc("/ad/search", adhandler.SearchHandler)
-	http.HandleFunc("/ad/impression",adhandler.ImpressionHandler)
-	http.HandleFunc("/ad/click",adhandler.ClickHandler)
-	http.HandleFunc("/ad/conversion",adhandler.ConversionHandler)
-	listenPort := ":" + strconv.Itoa(adserver.GlobalConfObject.AdServerPort)
-	http.ListenAndServe(listenPort, nil)
+    requestHandler := func(ctx *fasthttp.RequestCtx) {
+		switch string(ctx.Path()) {
+			case "/ad/search":
+				adhandler.SearchHandler(ctx)
+			case "/ad/impression":
+				adhandler.ImpressionHandler(ctx)
+			case "/ad/click":
+				adhandler.ClickHandler(ctx)
+			case "/ad/conversion":
+				adhandler.ConversionHandler(ctx)
+			default:
+				ctx.Error("Unsupported path", fasthttp.StatusNotFound)
+	    }
+    }
+    listenPort := ":" + strconv.Itoa(adserver.GlobalConfObject.AdServerPort)
+    fasthttp.ListenAndServe(listenPort, requestHandler)
 }

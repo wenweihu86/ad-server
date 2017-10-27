@@ -2,11 +2,11 @@ package adhandler
 
 import (
 	"encoding/json"
-	"net/http"
+	"github.com/valyala/fasthttp"
 	"strconv"
 	"time"
 	"math/rand"
-	"github.com/wenweihu86/ad-server/adserver"
+	"ad-server/adserver"
 	"strings"
 	"fmt"
 	"bytes"
@@ -14,47 +14,47 @@ import (
 	"github.com/satori/go.uuid"
 )
 
-func SearchHandler(w http.ResponseWriter, r *http.Request) {
-	r.ParseForm()
+func SearchHandler(ctx *fasthttp.RequestCtx) {
+	args := ctx.QueryArgs()
 	req := new(adserver.Request)
 	// slot_id
-	if len(r.Form["slot_id"]) > 0 {
-		slotId, err := strconv.ParseUint(r.Form["slot_id"][0], 10, 32)
+	if len(args.Peek("slot_id")) > 0 {
+		slotId, err := strconv.ParseUint(string(args.Peek("slot_id")), 10, 32)
 		if err != nil {
-			w.Write([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
+			ctx.SetBody([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
 			return 
 		}
 		req.SlotId = uint32(slotId)
 	}
 	// ad_num
-	if len(r.Form["ad_num"]) > 0 {
-		reqAdNum, err := strconv.ParseUint(r.Form["ad_num"][0], 10, 32)
+	if len(args.Peek("ad_num")) > 0 {
+		reqAdNum, err := strconv.ParseUint(string(args.Peek("ad_num")), 10, 32)
 		if err != nil {
-			w.Write([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
+			ctx.SetBody([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
 			return 
 		}
 		req.ReqAdNum = uint32(reqAdNum)
 	}
 	// ip
-	if len(r.Form["ip"]) > 0 {
-		req.Ip = r.Form["ip"][0]
+	if len(args.Peek("ip")) > 0 {
+		req.Ip = string(args.Peek("ip"))
 	}
 	// device_id
-	if len(r.Form["device_id"]) > 0 {
-		req.DeviceId = r.Form["device_id"][0]
+	if len(args.Peek("device_id")) > 0 {
+		req.DeviceId = string(args.Peek("device_id"))
 	}
 	// os
-	if len(r.Form["os"]) > 0 {
-		os, err := strconv.ParseUint(r.Form["os"][0], 10, 32)
+	if len(args.Peek("os")) > 0 {
+		os, err := strconv.ParseUint(string(args.Peek("os")), 10, 32)
 		if err != nil {
-			w.Write([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
+			ctx.SetBody([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
 			return 
 		}
 		req.Os = uint32(os)
 	}
 	// os_version
-	if len(r.Form["os_version"]) > 0 {
-		req.OsVersion = r.Form["os_version"][0]
+	if len(args.Peek("os_version")) > 0 {
+		req.OsVersion = string(args.Peek("os_version"))
 	}
 
 	// searchId
@@ -149,10 +149,10 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 
 	resBytes, err := json.Marshal(res)
 	if err != nil {
-		w.Write([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
+		ctx.SetBody([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
 		return 
 	}
-	w.Write(resBytes)
+	ctx.SetBody(resBytes)
 }
 
 func buildImpressionTrackUrl(req *adserver.Request, adInfo adserver.AdInfo) string {

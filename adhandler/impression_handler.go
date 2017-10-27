@@ -1,31 +1,31 @@
 package adhandler
 
 import (
-	"net/http"
+	"github.com/valyala/fasthttp"
 	"strconv"
-	"github.com/wenweihu86/ad-server/adserver"
+	"ad-server/adserver"
 	"encoding/base64"
 	"fmt"
 	"net/url"
 )
 
 // 展现监控handler
-func ImpressionHandler(w http.ResponseWriter, r *http.Request) {
-	r.ParseForm()
-	if len(r.Form["i"]) == 0 {
-		w.Write([]byte("{\"status\": 1}"))
+func ImpressionHandler(ctx *fasthttp.RequestCtx) {
+	args := ctx.QueryArgs()
+	if len(args.Peek("i")) == 0 {
+		ctx.SetBody([]byte("{\"status\": 1}"))
 		return
-	}
-	i := r.Form["i"][0]
-	queryStringBytes, err := base64.StdEncoding.DecodeString(i)
+    }
+	argsValueBytes := args.Peek("i")
+	queryStringBytes, err := base64.StdEncoding.DecodeString(string(argsValueBytes))
 	if err != nil {
-		w.Write([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
+		ctx.SetBody([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
 		return
 	}
 	queryString := string(queryStringBytes)
 	paramMap, err := url.ParseQuery(queryString)
 	if err != nil {
-		w.Write([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
+		ctx.SetBody([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
 		return 
 	}
 
@@ -40,7 +40,7 @@ func ImpressionHandler(w http.ResponseWriter, r *http.Request) {
 	if slotIds, exist := paramMap["slot_id"]; exist {
 		tmpInt, err := strconv.ParseUint(slotIds[0], 10, 32)
 		if err != nil {
-			w.Write([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
+			ctx.SetBody([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
 			return 
 		}
 		slotId = uint32(tmpInt)
@@ -63,7 +63,7 @@ func ImpressionHandler(w http.ResponseWriter, r *http.Request) {
 	if osString, exist := paramMap["os"]; exist {
 		tmpInt, err := strconv.ParseUint(osString[0], 10, 32)
 		if err != nil {
-			w.Write([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
+			ctx.SetBody([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
 			return 
 		}
 		os = uint32(tmpInt)
@@ -80,7 +80,7 @@ func ImpressionHandler(w http.ResponseWriter, r *http.Request) {
 	if unitIdString, exist := paramMap["unit_id"]; exist {
 		tmpInt, err := strconv.ParseUint(unitIdString[0], 10, 32)
 		if err != nil {
-			w.Write([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
+			ctx.SetBody([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
 			return 
 		}
 		unitId = uint32(tmpInt)
@@ -91,7 +91,7 @@ func ImpressionHandler(w http.ResponseWriter, r *http.Request) {
 	if creativeIdString, exist := paramMap["creative_id"]; exist {
 		tmp, err := strconv.ParseUint(creativeIdString[0], 10, 32)
 		if err != nil {
-			w.Write([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
+			ctx.SetBody([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
 			return 
 		}
 		creativeId = uint32(tmp)
@@ -101,5 +101,5 @@ func ImpressionHandler(w http.ResponseWriter, r *http.Request) {
     	"impression=1 searchId=%s slotId=%d ip=%s deviceId=%s os=%d osVersion=%s unit_id=%d creativeId=%d",
 		searchId, slotId, ip, deviceId, os, osVersion, unitId, creativeId))
 	res := "{\"status\": 0}"
-	w.Write([]byte(res))
+	ctx.SetBody([]byte(res))
 }

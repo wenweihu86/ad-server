@@ -8,7 +8,7 @@ import (
 	"bufio"
 	"strconv"
 	"sort"
-	"github.com/wenweihu86/ad-server/utils"
+	"ad-server/utils"
 	"time"
 )
 

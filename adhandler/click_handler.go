@@ -1,30 +1,25 @@
 package adhandler
 
 import (
-	"net/http"
+	"github.com/valyala/fasthttp"
 	"strconv"
-	"github.com/wenweihu86/ad-server/adserver"
+	"ad-server/adserver"
     "encoding/base64"
 	"fmt"
 	"net/url"
 )
 
-func ClickHandler(w http.ResponseWriter, r *http.Request) {
-	r.ParseForm()
-	if len(r.Form["i"]) == 0 {
-		w.Write([]byte("{\"status\": 1}"))
+func ClickHandler(ctx *fasthttp.RequestCtx) {
+	args := ctx.QueryArgs()
+	if len(args.Peek("i")) == 0 {
+		ctx.SetBody([]byte("{\"status\": 1}"))
 		return
-	}
-	i := r.Form["i"][0]
-	queryStringBytes, err := base64.StdEncoding.DecodeString(i)
+    }
+	argsVlueBytes := args.Peek("i")
+	queryStringBytes, err := base64.StdEncoding.DecodeString(string(argsVlueBytes))
+	paramMap, err := url.ParseQuery(string(queryStringBytes))
 	if err != nil {
-		w.Write([]byte("{\"status\": 1}"))
-		return
-	}
-	queryString := string(queryStringBytes)
-	paramMap, err := url.ParseQuery(queryString)
-	if err != nil {
-		w.Write([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
+		ctx.SetBody([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
 		return 
 	}
 
@@ -39,7 +34,7 @@ func ClickHandler(w http.ResponseWriter, r *http.Request) {
 	if slotIds, exist := paramMap["slot_id"]; exist {
 		tmpInt, err := strconv.ParseUint(slotIds[0], 10, 32)
 		if err != nil {
-			w.Write([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
+			ctx.SetBody([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
 		return 
 	}
 		slotId = uint32(tmpInt)
@@ -94,5 +89,5 @@ func ClickHandler(w http.ResponseWriter, r *http.Request) {
 	adserver.ClickLog.Info(fmt.Sprintf(
 		"click=1 searchId=%s slotId=%d ip=%s deviceId=%s os=%d osVersion=%s unit_id=%d creativeId=%d",
 		searchId, slotId, ip, deviceId, os, osVersion, unitId, creativeId))
-	http.Redirect(w, r, clickUrl, http.StatusFound)
+	ctx.Redirect(clickUrl, fasthttp.StatusFound)
 }
