@@ -5,7 +5,8 @@ import:
 - package: github.com/spf13/viper
 - package: golang.org/x/sys
   subpackages:
-  - /unix
+  - unix
 - package: golang.org/x/text
   subpackages:
-  - /transform
+  - transform
+- package: github.com/valyala/fasthttp

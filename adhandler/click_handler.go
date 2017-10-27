@@ -3,7 +3,7 @@ package adhandler
 import (
 	"github.com/valyala/fasthttp"
 	"strconv"
-	"ad-server/adserver"
+	"github.com/wenweihu86/ad-server/adserver"
     "encoding/base64"
 	"fmt"
 	"net/url"

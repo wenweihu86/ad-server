@@ -1,5 +1,5 @@
-hash: b29d41755c8a724cb74c23c14a6aaa9512c2ca063d4339d4fea9e269fbb48931
-updated: 2017-10-27T10:20:55.008291701+08:00
+hash: a54035ee832369432528afe6b0f1e8f4c86920ed94e0e23692e9c3381e0a2149
+updated: 2017-10-27T18:43:35.542722802+08:00
 imports:
 - name: github.com/fsnotify/fsnotify
   version: 4da3e2cfbabc9f751898f250b49f2439785783a1
@@ -16,6 +16,14 @@ imports:
   - json/token
 - name: github.com/ibbd-dev/go-async-log
   version: a5c968f2b3f34c14f4891e51c935a9c634a47df4
+- name: github.com/klauspost/compress
+  version: f3dce52e0576655d55fd69e74b63da96ad1108f3
+  subpackages:
+  - flate
+  - gzip
+  - zlib
+- name: github.com/klauspost/cpuid
+  version: ae7887de9fa5d2db4eaa8174a7eff2c1ac00f2da
 - name: github.com/magiconair/properties
   version: 8d7837e64d3c1ee4e54a880c5a920ab4316fc90a
 - name: github.com/mitchellh/mapstructure
@@ -36,8 +44,15 @@ imports:
   version: 97afa5e7ca8a08a383cb259e06636b5e2cc7897f
 - name: github.com/spf13/viper
   version: 8ef37cbca71638bf32f3d5e194117d4cb46da163
+- name: github.com/valyala/bytebufferpool
+  version: e746df99fe4a3986f4d4f79e13c1e0117ce9c2f7
+- name: github.com/valyala/fasthttp
+  version: 70ceaddfae639b5f0eca290382de18f64d5aa62d
+  subpackages:
+  - fasthttputil
+  - stackless
 - name: golang.org/x/sys
-  version: 164713f0dfcec4e80be8b53e1f0811f5f0d84578
+  version: 0649f9fe46d917da5591af4d4784b6badd31d7e5
   subpackages:
   - unix
 - name: golang.org/x/text

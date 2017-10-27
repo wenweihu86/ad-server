@@ -1,8 +1,8 @@
 package main
 
 import (
-	"ad-server/adserver"
-	"ad-server/adhandler"
+	"github.com/wenweihu86/ad-server/adserver"
+	"github.com/wenweihu86/ad-server/adhandler"
 	"os"
 	"github.com/valyala/fasthttp"
 	"strconv"
