@@ -12,7 +12,7 @@ import (
 // 展现监控handler
 func ImpressionHandler(ctx *fasthttp.RequestCtx) {
 	args := ctx.QueryArgs()
-	if len(args.Peek("i")) == 0 {
+	if !args.Has("i") {
 		ctx.SetBody([]byte("{\"status\": 1}"))
 		return
     }

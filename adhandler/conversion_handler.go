@@ -12,10 +12,10 @@ import (
 // 转化监控handler
 func ConversionHandler(ctx *fasthttp.RequestCtx) {
 	args := ctx.QueryArgs()
-	if len(args.Peek("i")) == 0 {
+	if !args.Has("i") {
 		ctx.SetBody([]byte("{\"status\": 1}"))
 		return
-    }
+	}
 	argsValueBytes := args.Peek("i")
 	queryStringBytes, err := base64.StdEncoding.DecodeString(string(argsValueBytes))
 	if err != nil {

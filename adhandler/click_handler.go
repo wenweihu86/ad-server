@@ -11,10 +11,10 @@ import (
 
 func ClickHandler(ctx *fasthttp.RequestCtx) {
 	args := ctx.QueryArgs()
-	if len(args.Peek("i")) == 0 {
+	if !args.Has("i") {
 		ctx.SetBody([]byte("{\"status\": 1}"))
 		return
-    }
+	}
 	argsVlueBytes := args.Peek("i")
 	queryStringBytes, err := base64.StdEncoding.DecodeString(string(argsVlueBytes))
 	paramMap, err := url.ParseQuery(string(queryStringBytes))
