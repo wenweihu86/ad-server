@@ -153,13 +153,14 @@ func (locationDict *IpDict) StartReloadTimer() {
 			if blockCurrentModifiedTime > locationDict.BlockLastModifiedTime || locationCurrentModifiedTime > locationDict.LocationLastModifiedTime {
 				AdServerLog.Info(fmt.Sprintf("start reload ad info dict at %s",
 					t1.Format("2006-01-02 03:04:05")))
-				_, err := LoadLocationDict(
+				ipDataInfo, err := LoadLocationDict(
 					GlobalConfObject.GeoBlockFileName,
 					GlobalConfObject.GeoLocationFileName)
 				if err != nil {
 					continue
 				}
 				nextIndex := 1 - locationDict.CurrentIndex
+				locationDict.IpDataArray[nextIndex] = ipDataInfo
 				locationDict.CurrentIndex = nextIndex
 				locationDict.BlockLastModifiedTime = blockCurrentModifiedTime
 				locationDict.LocationLastModifiedTime = locationCurrentModifiedTime
