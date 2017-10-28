@@ -3,7 +3,6 @@ package adhandler
 import (
 	"encoding/json"
 	"github.com/valyala/fasthttp"
-	"strconv"
 	"time"
 	"math/rand"
 	"github.com/wenweihu86/ad-server/adserver"
@@ -15,45 +14,45 @@ import (
 )
 
 func SearchHandler(ctx *fasthttp.RequestCtx) {
+	beginTime := time.Now().Nanosecond()
 	args := ctx.QueryArgs()
 	req := new(adserver.Request)
 	// slot_id
-	if len(args.Peek("slot_id")) > 0 {
-		slotId, err := strconv.ParseUint(string(args.Peek("slot_id")), 10, 32)
-		if err != nil {
-			ctx.SetBody([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
-			return 
-		}
-		req.SlotId = uint32(slotId)
+	slotId, err := args.GetUint("slot_id")
+	if err != nil {
+		ctx.SetBody([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
+		return
 	}
+	req.SlotId = uint32(slotId)
+
 	// ad_num
-	if len(args.Peek("ad_num")) > 0 {
-		reqAdNum, err := strconv.ParseUint(string(args.Peek("ad_num")), 10, 32)
-		if err != nil {
-			ctx.SetBody([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
-			return 
-		}
-		req.ReqAdNum = uint32(reqAdNum)
+	reqAdNum, err := args.GetUint("ad_num")
+	if err != nil {
+		ctx.SetBody([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
+		return
 	}
+	req.ReqAdNum = uint32(reqAdNum)
+
 	// ip
-	if len(args.Peek("ip")) > 0 {
+	if args.Has("ip") {
 		req.Ip = string(args.Peek("ip"))
 	}
+
 	// device_id
-	if len(args.Peek("device_id")) > 0 {
+	if args.Has("device_id") {
 		req.DeviceId = string(args.Peek("device_id"))
 	}
+
 	// os
-	if len(args.Peek("os")) > 0 {
-		os, err := strconv.ParseUint(string(args.Peek("os")), 10, 32)
-		if err != nil {
-			ctx.SetBody([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
-			return 
-		}
-		req.Os = uint32(os)
+	os, err := args.GetUint("os")
+	if err != nil {
+		ctx.SetBody([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
+		return
 	}
+	req.Os = uint32(os)
+
 	// os_version
-	if len(args.Peek("os_version")) > 0 {
+	if args.Has("os_version") {
 		req.OsVersion = string(args.Peek("os_version"))
 	}
 
@@ -141,11 +140,12 @@ func SearchHandler(ctx *fasthttp.RequestCtx) {
 		res.ResCode = 0
 		res.AdList = make([]adserver.AdInfo, 0, 1)
 	}
+	elapseTimeMs := (time.Now().Nanosecond() - beginTime) / 1000000
     adserver.SearchLog.Info(fmt.Sprintf(
-			"searchId=%s slotId=%d adNum=%d iP=%s deviceId=%s oS=%d osVersion=%s " +
-			"unitId=%s creativeId=%s resAdNum=%d\n",
-			req.SearchId, req.SlotId, req.ReqAdNum, req.Ip, req.DeviceId, req.Os, req.OsVersion,
-			unitIdsStr, creativeIdsStr,resAdNum))
+			"searchId=%s elpaseMs=%d slotId=%d reqAdNum=%d resAdNum=%d " +
+				"iP=%s deviceId=%s oS=%d osVersion=%s unitId=%s creativeId=%s\n",
+			req.SearchId, elapseTimeMs, req.SlotId, req.ReqAdNum, resAdNum,
+			req.Ip, req.DeviceId, req.Os, req.OsVersion, unitIdsStr, creativeIdsStr))
 
 	resBytes, err := json.Marshal(res)
 	if err != nil {

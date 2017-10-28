@@ -151,7 +151,7 @@ func (locationDict *IpDict) StartReloadTimer() {
 			locationCurrentModifiedTime := locationFileStat.ModTime().Unix()
 			// 如果文件有更新，则重新加载广告内容
 			if blockCurrentModifiedTime > locationDict.BlockLastModifiedTime || locationCurrentModifiedTime > locationDict.LocationLastModifiedTime {
-				AdServerLog.Info(fmt.Sprintf("start reload ad info dict at %s",
+				AdServerLog.Info(fmt.Sprintf("start reload location info dict at %s",
 					t1.Format("2006-01-02 03:04:05")))
 				ipDataInfo, err := LoadLocationDict(
 					GlobalConfObject.GeoBlockFileName,
