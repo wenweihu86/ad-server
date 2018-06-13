@@ -1,9 +1,8 @@
-package adhandler
+package core
 
 import (
 	"github.com/valyala/fasthttp"
 	"strconv"
-	"github.com/wenweihu86/ad-server/adserver"
 	"encoding/base64"
 	"fmt"
 	"net/url"
@@ -97,7 +96,7 @@ func ImpressionHandler(ctx *fasthttp.RequestCtx) {
 		creativeId = uint32(tmp)
 	}
 
-    adserver.ImpressionLog.Info(fmt.Sprintf(
+    ImpressionLog.Info(fmt.Sprintf(
     	"impression=1 searchId=%s slotId=%d ip=%s deviceId=%s os=%d osVersion=%s unit_id=%d creativeId=%d",
 		searchId, slotId, ip, deviceId, os, osVersion, unitId, creativeId))
 	res := "{\"status\": 0}"

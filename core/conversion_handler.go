@@ -1,23 +1,28 @@
-package adhandler
+package core
 
 import (
 	"github.com/valyala/fasthttp"
 	"strconv"
-	"github.com/wenweihu86/ad-server/adserver"
-    "encoding/base64"
+	"encoding/base64"
 	"fmt"
 	"net/url"
 )
 
-func ClickHandler(ctx *fasthttp.RequestCtx) {
+// 转化监控handler
+func ConversionHandler(ctx *fasthttp.RequestCtx) {
 	args := ctx.QueryArgs()
 	if !args.Has("i") {
 		ctx.SetBody([]byte("{\"status\": 1}"))
 		return
 	}
-	argsVlueBytes := args.Peek("i")
-	queryStringBytes, err := base64.URLEncoding.DecodeString(string(argsVlueBytes))
-	paramMap, err := url.ParseQuery(string(queryStringBytes))
+	argsValueBytes := args.Peek("i")
+	queryStringBytes, err := base64.URLEncoding.DecodeString(string(argsValueBytes))
+	if err != nil {
+		ctx.SetBody([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
+		return
+	}
+	queryString := string(queryStringBytes)
+	paramMap, err := url.ParseQuery(queryString)
 	if err != nil {
 		ctx.SetBody([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
 		return 
@@ -35,8 +40,8 @@ func ClickHandler(ctx *fasthttp.RequestCtx) {
 		tmpInt, err := strconv.ParseUint(slotIds[0], 10, 32)
 		if err != nil {
 			ctx.SetBody([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
-		return 
-	}
+			return 
+		}
 		slotId = uint32(tmpInt)
 	}
 
@@ -55,7 +60,11 @@ func ClickHandler(ctx *fasthttp.RequestCtx) {
 	// os
 	var os uint32
 	if osString, exist := paramMap["os"]; exist {
-		tmpInt, _ := strconv.ParseUint(osString[0], 10, 32)
+		tmpInt, err := strconv.ParseUint(osString[0], 10, 32)
+		if err != nil {
+			ctx.SetBody([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
+			return 
+		}
 		os = uint32(tmpInt)
 	}
 
@@ -68,26 +77,28 @@ func ClickHandler(ctx *fasthttp.RequestCtx) {
 	// unit_id
 	var unitId uint32
 	if unitIdString, exist := paramMap["unit_id"]; exist {
-		tmpInt, _ := strconv.ParseUint(unitIdString[0], 10, 32)
+		tmpInt, err := strconv.ParseUint(unitIdString[0], 10, 32)
+		if err != nil {
+			ctx.SetBody([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
+			return 
+		}
 		unitId = uint32(tmpInt)
 	}
 
 	// creative_id
 	var creativeId uint32
 	if creativeIdString, exist := paramMap["creative_id"]; exist {
-		tmp, _ := strconv.ParseUint(creativeIdString[0], 10, 32)
+		tmp, err := strconv.ParseUint(creativeIdString[0], 10, 32)
+		if err != nil {
+			ctx.SetBody([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
+			return 
+		}
 		creativeId = uint32(tmp)
 	}
 
-	// click_url
-	var clickUrl string
-	if clickUrls, exist := paramMap["click_url"]; exist {
-		clickUrl = clickUrls[0]
-	}
-	adserver.AdServerLog.Debug(fmt.Sprintf("ClickHandler click_url=%s", clickUrl))
-
-	adserver.ClickLog.Info(fmt.Sprintf(
-		"click=1 searchId=%s slotId=%d ip=%s deviceId=%s os=%d osVersion=%s unit_id=%d creativeId=%d",
+    ConversionLog.Info(fmt.Sprintf(
+    	"conversion=1 searchId=%s slotId=%d ip=%s deviceId=%s os=%d osVersion=%s unit_id=%d creativeId=%d",
 		searchId, slotId, ip, deviceId, os, osVersion, unitId, creativeId))
-	ctx.Redirect(clickUrl, fasthttp.StatusFound)
+	res := "{\"status\": 0}"
+	ctx.SetBody([]byte(res))
 }

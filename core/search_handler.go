@@ -1,11 +1,10 @@
-package adhandler
+package core
 
 import (
 	"encoding/json"
 	"github.com/valyala/fasthttp"
 	"time"
 	"math/rand"
-	"github.com/wenweihu86/ad-server/adserver"
 	"strings"
 	"fmt"
 	"bytes"
@@ -16,7 +15,7 @@ import (
 func SearchHandler(ctx *fasthttp.RequestCtx) {
 	beginTime := time.Now().Nanosecond()
 	args := ctx.QueryArgs()
-	req := new(adserver.Request)
+	req := new(Request)
 	// slot_id
 	slotId, err := args.GetUint("slot_id")
 	if err != nil {
@@ -57,18 +56,24 @@ func SearchHandler(ctx *fasthttp.RequestCtx) {
 	}
 
 	// searchId
-	req.SearchId = uuid.NewV4().String()
+	uuid, err := uuid.NewV4()
+	if err != nil {
+		AdServerLog.Warn("uuid NewV4 failed")
+		req.SearchId = string(rand.Uint64())
+	} else {
+		req.SearchId = uuid.String()
+	}
 
-	adData := adserver.AdDictObject.GetCurrentAdData()
+	adData := AdDictObject.GetCurrentAdData()
 	// search by request ip
 	var unitIdList1 []uint32
 	var exist1 bool
-	ipDataInfo := adserver.LocationDict.GetCurrentIpData()
+	ipDataInfo := LocationDict.GetCurrentIpData()
 	locationInfo := ipDataInfo.SearchLocationByIp(req.Ip)
 	if locationInfo != nil {
 		country := locationInfo.Country
 		city := locationInfo.City
-		adserver.AdServerLog.Debug(fmt.Sprintf(
+		AdServerLog.Debug(fmt.Sprintf(
 			"ip=%s country=%s city=%s\n", req.Ip, country, city))
 		key := strings.ToLower(country) + "_" + strings.ToLower(city)
 		unitIdList1, exist1 = adData.LocationUnitMap[key]
@@ -93,8 +98,8 @@ func SearchHandler(ctx *fasthttp.RequestCtx) {
 	}
      
 	// select one from unit id list
-	var res = &adserver.Response{}
-	adList := make([]adserver.AdInfo, 0, 1)
+	var res = &Response{}
+	adList := make([]AdInfo, 0, 1)
 	unitIdMap := make(map[int] bool)
 	var unitIdsStr, creativeIdsStr string
 	resAdNum := 0 
@@ -112,7 +117,7 @@ func SearchHandler(ctx *fasthttp.RequestCtx) {
 			unitId := unitIdList[randIndex]
 			unitInfo := adData.AdUnitMap[unitId]
 			adCreative := adData.AdCreativeMap[unitInfo.CreativeId]
-			adInfo := adserver.AdInfo{
+			adInfo := AdInfo{
 				UnitId: unitInfo.UnitId,
 				CreativeId: adCreative.CreativeId,
 				Title: adCreative.Title,
@@ -138,10 +143,10 @@ func SearchHandler(ctx *fasthttp.RequestCtx) {
 		res.AdList = adList
 	} else {
 		res.ResCode = 0
-		res.AdList = make([]adserver.AdInfo, 0, 1)
+		res.AdList = make([]AdInfo, 0, 1)
 	}
 	elapseTimeMs := (time.Now().Nanosecond() - beginTime) / 1000000
-    adserver.SearchLog.Info(fmt.Sprintf(
+    SearchLog.Info(fmt.Sprintf(
 			"searchId=%s elpaseMs=%d slotId=%d reqAdNum=%d resAdNum=%d " +
 				"iP=%s deviceId=%s oS=%d osVersion=%s unitId=%s creativeId=%s\n",
 			req.SearchId, elapseTimeMs, req.SlotId, req.ReqAdNum, resAdNum,
@@ -155,7 +160,7 @@ func SearchHandler(ctx *fasthttp.RequestCtx) {
 	ctx.SetBody(resBytes)
 }
 
-func buildImpressionTrackUrl(req *adserver.Request, adInfo adserver.AdInfo) string {
+func buildImpressionTrackUrl(req *Request, adInfo AdInfo) string {
 	var paramBuf bytes.Buffer
 	paramBuf.WriteString(fmt.Sprintf("search_id=%s", req.SearchId))
 	paramBuf.WriteString(fmt.Sprintf("&slot_id=%d", req.SlotId))
@@ -167,11 +172,11 @@ func buildImpressionTrackUrl(req *adserver.Request, adInfo adserver.AdInfo) stri
 	paramBuf.WriteString(fmt.Sprintf("&creative_id=%d", adInfo.CreativeId))
 	paramEncoded := base64.URLEncoding.EncodeToString(paramBuf.Bytes())
 	impressionTrackUrl := fmt.Sprintf("%s?i=%s",
-		adserver.GlobalConfObject.ImpressionTrackUrlPrefix, paramEncoded)
+		GlobalConfObject.ImpressionTrackUrlPrefix, paramEncoded)
 	return impressionTrackUrl
 }
 
-func buildClickTrackUrl(req *adserver.Request, adInfo adserver.AdInfo) string {
+func buildClickTrackUrl(req *Request, adInfo AdInfo) string {
 	var paramBuf bytes.Buffer
 	paramBuf.WriteString(fmt.Sprintf("search_id=%s", req.SearchId))
 	paramBuf.WriteString(fmt.Sprintf("&slot_id=%d", req.SlotId))
@@ -184,11 +189,11 @@ func buildClickTrackUrl(req *adserver.Request, adInfo adserver.AdInfo) string {
 	paramBuf.WriteString(fmt.Sprintf("&click_url=%s", adInfo.ClickUrl))
 	paramEncoded := base64.URLEncoding.EncodeToString(paramBuf.Bytes())
 	impressionTrackUrl := fmt.Sprintf("%s?i=%s",
-		adserver.GlobalConfObject.ClickTrackUrlPrefix, paramEncoded)
+		GlobalConfObject.ClickTrackUrlPrefix, paramEncoded)
 	return impressionTrackUrl
 }
 
-func buildConversionTrackUrl(req *adserver.Request, adInfo adserver.AdInfo) string {
+func buildConversionTrackUrl(req *Request, adInfo AdInfo) string {
 	var paramBuf bytes.Buffer
 	paramBuf.WriteString(fmt.Sprintf("search_id=%s", req.SearchId))
 	paramBuf.WriteString(fmt.Sprintf("&slot_id=%d", req.SlotId))
@@ -201,7 +206,7 @@ func buildConversionTrackUrl(req *adserver.Request, adInfo adserver.AdInfo) stri
 	paramBuf.WriteString(fmt.Sprintf("&click_url=%s", adInfo.ClickUrl))
 	paramEncoded := base64.URLEncoding.EncodeToString(paramBuf.Bytes())
 	conversionTrackUrl := fmt.Sprintf("%s?i=%s",
-		adserver.GlobalConfObject.ConversionTrackUrlPrefix, paramEncoded)
+		GlobalConfObject.ConversionTrackUrlPrefix, paramEncoded)
 	return conversionTrackUrl
 }
 

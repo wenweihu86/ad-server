@@ -1,4 +1,4 @@
-package adserver
+package core
 
 import (
 	"io"

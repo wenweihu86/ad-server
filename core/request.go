@@ -1,4 +1,4 @@
-package adserver
+package core
 
 type Request struct {
 	SearchId string

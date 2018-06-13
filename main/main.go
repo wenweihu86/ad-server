@@ -1,45 +1,44 @@
 package main
 
 import (
-	"github.com/wenweihu86/ad-server/adserver"
-	"github.com/wenweihu86/ad-server/adhandler"
+	"github.com/wenweihu86/ad-server/core"
 	"os"
 	"github.com/valyala/fasthttp"
 	"strconv"
 )
 
 func main() {
-	adserver.LoadGlobalConf("./conf", "ad_server")
-	adserver.InitLog(adserver.GlobalConfObject)
+	core.LoadGlobalConf("./conf", "ad_server")
+	core.InitLog(core.GlobalConfObject)
 	//加载位置字典
-	err := adserver.LocationDict.Load()
+	err := core.LocationDict.Load()
 	if err != nil {
 		os.Exit(-1)
 	}
-	adserver.LocationDict.StartReloadTimer()
+	core.LocationDict.StartReloadTimer()
 	
 	// 初始化并加载广告信息
-	adserver.AdDictObject = adserver.NewAdDict(adserver.GlobalConfObject.AdFileName)
-	err = adserver.AdDictObject.Load()
+	core.AdDictObject = core.NewAdDict(core.GlobalConfObject.AdFileName)
+	err = core.AdDictObject.Load()
 	if err != nil {
 		os.Exit(-1)
 	}
-	adserver.AdDictObject.StartReloadTimer()
+	core.AdDictObject.StartReloadTimer()
 
     requestHandler := func(ctx *fasthttp.RequestCtx) {
 		switch string(ctx.Path()) {
 			case "/ad/search":
-				adhandler.SearchHandler(ctx)
+				core.SearchHandler(ctx)
 			case "/ad/impression":
-				adhandler.ImpressionHandler(ctx)
+				core.ImpressionHandler(ctx)
 			case "/ad/click":
-				adhandler.ClickHandler(ctx)
+				core.ClickHandler(ctx)
 			case "/ad/conversion":
-				adhandler.ConversionHandler(ctx)
+				core.ConversionHandler(ctx)
 			default:
 				ctx.Error("Unsupported path", fasthttp.StatusNotFound)
 	    }
     }
-    listenPort := ":" + strconv.Itoa(adserver.GlobalConfObject.AdServerPort)
+    listenPort := ":" + strconv.Itoa(core.GlobalConfObject.AdServerPort)
     fasthttp.ListenAndServe(listenPort, requestHandler)
 }

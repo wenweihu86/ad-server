@@ -1,4 +1,4 @@
-package adserver
+package core
 
 import (
 	"github.com/spf13/viper"

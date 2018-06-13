@@ -1,4 +1,4 @@
-package adserver
+package core
 
 import "github.com/ibbd-dev/go-async-log"
 

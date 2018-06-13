@@ -1,4 +1,4 @@
-package adserver
+package core
 
 type AdInfo struct {
 	UnitId uint32
