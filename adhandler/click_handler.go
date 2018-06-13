@@ -16,7 +16,7 @@ func ClickHandler(ctx *fasthttp.RequestCtx) {
 		return
 	}
 	argsVlueBytes := args.Peek("i")
-	queryStringBytes, err := base64.StdEncoding.DecodeString(string(argsVlueBytes))
+	queryStringBytes, err := base64.URLEncoding.DecodeString(string(argsVlueBytes))
 	paramMap, err := url.ParseQuery(string(queryStringBytes))
 	if err != nil {
 		ctx.SetBody([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))

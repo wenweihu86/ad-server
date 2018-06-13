@@ -165,7 +165,7 @@ func buildImpressionTrackUrl(req *adserver.Request, adInfo adserver.AdInfo) stri
 	paramBuf.WriteString(fmt.Sprintf("&os_version=%s", req.OsVersion))
 	paramBuf.WriteString(fmt.Sprintf("&unit_id=%d", adInfo.UnitId))
 	paramBuf.WriteString(fmt.Sprintf("&creative_id=%d", adInfo.CreativeId))
-	paramEncoded := base64.StdEncoding.EncodeToString(paramBuf.Bytes())
+	paramEncoded := base64.URLEncoding.EncodeToString(paramBuf.Bytes())
 	impressionTrackUrl := fmt.Sprintf("%s?i=%s",
 		adserver.GlobalConfObject.ImpressionTrackUrlPrefix, paramEncoded)
 	return impressionTrackUrl
@@ -182,7 +182,7 @@ func buildClickTrackUrl(req *adserver.Request, adInfo adserver.AdInfo) string {
 	paramBuf.WriteString(fmt.Sprintf("&unit_id=%d", adInfo.UnitId))
 	paramBuf.WriteString(fmt.Sprintf("&creative_id=%d", adInfo.CreativeId))
 	paramBuf.WriteString(fmt.Sprintf("&click_url=%s", adInfo.ClickUrl))
-	paramEncoded := base64.StdEncoding.EncodeToString(paramBuf.Bytes())
+	paramEncoded := base64.URLEncoding.EncodeToString(paramBuf.Bytes())
 	impressionTrackUrl := fmt.Sprintf("%s?i=%s",
 		adserver.GlobalConfObject.ClickTrackUrlPrefix, paramEncoded)
 	return impressionTrackUrl
@@ -199,7 +199,7 @@ func buildConversionTrackUrl(req *adserver.Request, adInfo adserver.AdInfo) stri
 	paramBuf.WriteString(fmt.Sprintf("&unit_id=%d", adInfo.UnitId))
 	paramBuf.WriteString(fmt.Sprintf("&creative_id=%d", adInfo.CreativeId))
 	paramBuf.WriteString(fmt.Sprintf("&click_url=%s", adInfo.ClickUrl))
-	paramEncoded := base64.StdEncoding.EncodeToString(paramBuf.Bytes())
+	paramEncoded := base64.URLEncoding.EncodeToString(paramBuf.Bytes())
 	conversionTrackUrl := fmt.Sprintf("%s?i=%s",
 		adserver.GlobalConfObject.ConversionTrackUrlPrefix, paramEncoded)
 	return conversionTrackUrl

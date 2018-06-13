@@ -17,7 +17,7 @@ func ConversionHandler(ctx *fasthttp.RequestCtx) {
 		return
 	}
 	argsValueBytes := args.Peek("i")
-	queryStringBytes, err := base64.StdEncoding.DecodeString(string(argsValueBytes))
+	queryStringBytes, err := base64.URLEncoding.DecodeString(string(argsValueBytes))
 	if err != nil {
 		ctx.SetBody([]byte("{\"status\": 1," + "\"error\":" + err.Error() + "}"))
 		return
