@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"bytes"
 	"encoding/base64"
-	"github.com/satori/go.uuid"
+	uuid2 "github.com/google/uuid"
 )
 
 func SearchHandler(ctx *fasthttp.RequestCtx) {
@@ -56,7 +56,7 @@ func SearchHandler(ctx *fasthttp.RequestCtx) {
 	}
 
 	// searchId
-	uuid, err := uuid.NewV4()
+	uuid := uuid2.New()
 	if err != nil {
 		AdServerLog.Warn("uuid NewV4 failed")
 		req.SearchId = string(rand.Uint64())
