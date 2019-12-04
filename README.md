@@ -1,9 +1,7 @@
 # ad-server
 advertising server
 # Getting Start
-- install go and glide env
-- cp -f mirrors.yaml ~/.glide/
-- glide install
+- go mod download
 - go build -o ad_server main/main.go
 - ./ad_server
 # Benchmark
